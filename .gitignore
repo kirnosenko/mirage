@@ -1,0 +1,7 @@
+# ignore this
+bin/
+obj/
+TestResults/
+*.user
+*.suo
+*.cachefile

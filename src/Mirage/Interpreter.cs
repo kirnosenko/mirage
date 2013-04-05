@@ -42,7 +42,7 @@ namespace Mirage
 						machine.Shl();
 						break;
 					case '!':
-						Console.WriteLine(ASCIIEncoding.ASCII.GetString(machine.Output()));
+						Console.Write(ASCIIEncoding.ASCII.GetString(machine.Output()));
 						break;
 					case '?':
 						machine.Input(UTF8Encoding.Unicode.GetBytes(Console.ReadLine()));
