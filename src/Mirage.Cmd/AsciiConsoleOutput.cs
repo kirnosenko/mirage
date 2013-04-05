@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Mirage
+namespace Mirage.Cmd
 {
 	public class AsciiConsoleOutput : IByteOutput
 	{

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Mirage
+namespace Mirage.Cmd
 {
 	public class AsciiConsoleInput : IByteInput
 	{

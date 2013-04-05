@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace Mirage
+namespace Mirage.Cmd
 {
 	class Program
 	{
