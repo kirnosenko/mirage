@@ -64,6 +64,12 @@ namespace Mirage
 					case '<':
 						Shl();
 						break;
+					case '&':
+						And();
+						break;
+					case '|':
+						Or();
+						break;
 					case '!':
 						Output();
 						break;
@@ -240,6 +246,34 @@ namespace Mirage
 
 			SetWord(word);
 		}
+		protected void And()
+		{
+			byte[] word = GetWord();
+			byte[] argument = GetArgument();
+
+			int counter = 0;
+			while (counter < word.Length)
+			{
+				word[counter] = (byte)(word[counter] & argument[counter]);
+				counter++;
+			}
+
+			SetWord(word);
+		}
+		protected void Or()
+		{
+			byte[] word = GetWord();
+			byte[] argument = GetArgument();
+
+			int counter = 0;
+			while (counter < word.Length)
+			{
+				word[counter] = (byte)(word[counter] | argument[counter]);
+				counter++;
+			}
+
+			SetWord(word);
+		}
 
 		protected void Output()
 		{
@@ -343,6 +377,40 @@ namespace Mirage
 			}
 
 			return true;
+		}
+		protected byte[] GetArgument()
+		{
+			if (pointerHi == pointerLo)
+			{
+				return new byte[] {};
+			}
+			int pointerDelta = pointerHi > pointerLo ? 1 : -1;
+			int startPointer = pointerLo;
+			int endPoiner = pointerHi;
+			if (pointerDelta < 0)
+			{
+				startPointer -= 1;
+				endPoiner -= 1;
+				startPointer += Math.Abs(pointerHi - pointerLo);
+				endPoiner += Math.Abs(pointerHi - pointerLo);
+			}
+			else
+			{
+				startPointer -= Math.Abs(pointerHi - pointerLo);
+				endPoiner -= Math.Abs(pointerHi - pointerLo);
+			}
+
+			byte[] argument = new byte[Math.Abs(pointerHi - pointerLo)];
+			int pointer = startPointer;
+			int counter = 0;
+			do
+			{
+				argument[counter] = memory[pointer];
+				pointer += pointerDelta;
+				counter++;
+			} while (pointer != endPoiner);
+
+			return argument;
 		}
 	}
 }

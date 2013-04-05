@@ -144,6 +144,24 @@ namespace Mirage.Tests
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 64, 0 });
 		}
 		[Test]
+		public void Should_do_logic_and()
+		{
+			m = new Machine(new byte[] { 0x0F, 0x7A, 0x38, 0xF2 });
+			m.ByteOutput = output;
+
+			m.Run("]]=]]&!");
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x08, 0x72 });
+		}
+		[Test]
+		public void Should_do_logic_or()
+		{
+			m = new Machine(new byte[] { 0x0F, 0x7A, 0x38, 0xF1 });
+			m.ByteOutput = output;
+
+			m.Run("]]=]]|!");
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x3F, 0xFB });
+		}
+		[Test]
 		public void Can_run_in_cycle()
 		{
 			m.Run("]+<<+{-]}+!");
