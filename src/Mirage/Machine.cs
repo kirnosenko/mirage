@@ -40,6 +40,27 @@ namespace Mirage
 			pointerLo = pointerHi;
 			pointerHi = temp;
 		}
+		public void LoadPointer()
+		{
+			if (pointerHi == pointerLo)
+			{
+				return;
+			}
+			byte[] word = GetWord();
+			pointerHi = 0;
+			
+			int counter = word.Length-1;
+			while (counter >= 0)
+			{
+				pointerHi = pointerHi << 8;
+				pointerHi |= word[counter];
+				counter--;
+			}
+		}
+		public void DragPointer()
+		{
+			pointerLo = pointerHi;
+		}
 
 		public void Inc()
 		{

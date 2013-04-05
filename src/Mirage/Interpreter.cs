@@ -26,6 +26,12 @@ namespace Mirage
 					case '%':
 						machine.XchPointers();
 						break;
+					case '$':
+						machine.LoadPointer();
+						break;
+					case '=':
+						machine.DragPointer();
+						break;
 					case '+':
 						machine.Inc();
 						break;

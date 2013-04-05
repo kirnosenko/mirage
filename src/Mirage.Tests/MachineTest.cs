@@ -55,6 +55,34 @@ namespace Mirage.Tests
 				.Should().Have.SameSequenceAs(new byte[] { 2, 1, 0 });
 		}
 		[Test]
+		public void Shloud_load_hi_pointer_from_word()
+		{
+			byte[] data = new byte[600];
+			data[512] = 0xFF;
+			data[513] = 0xFF;
+
+			m = new Machine(data);
+			m.PointerInc();
+			m.PointerInc();
+			m.Inc();
+			m.Shl();
+			m.Shl();
+			m.Shl();
+			m.Shl();
+			m.Shl();
+			m.Shl();
+			m.Shl();
+			m.Shl();
+			m.Shl();
+			m.LoadPointer();
+			m.DragPointer();
+			m.PointerInc();
+			m.PointerInc();
+
+			m.Output()
+				.Should().Have.SameSequenceAs(new byte[] { 255, 255 });
+		}
+		[Test]
 		public void Should_increment_word()
 		{
 			m.PointerInc();
