@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace Mirage
 {
@@ -24,6 +25,98 @@ namespace Mirage
 		{
 			pointerLo = 0;
 			pointerHi = 0;
+		}
+		public void Run(string src)
+		{
+			int pc = 0;
+			while (pc < src.Length)
+			{
+				char opcode = src[pc++];
+
+				switch (opcode)
+				{
+					case ']':
+						PointerInc();
+						break;
+					case '[':
+						PointerDec();
+						break;
+					case '%':
+						XchPointers();
+						break;
+					case '$':
+						LoadPointer();
+						break;
+					case '=':
+						DragPointer();
+						break;
+					case '+':
+						Inc();
+						break;
+					case '-':
+						Dec();
+						break;
+					case '~':
+						Not();
+						break;
+					case '>':
+						Shr();
+						break;
+					case '<':
+						Shl();
+						break;
+					case '!':
+						Console.Write(ASCIIEncoding.ASCII.GetString(Output()));
+						break;
+					case '?':
+						Input(UTF8Encoding.Unicode.GetBytes(Console.ReadLine()));
+						break;
+					case '{':
+						if (JmpForward())
+						{
+							int opened = 1;
+							while (opened > 0)
+							{
+								opcode = src[pc++];
+								switch (opcode)
+								{
+									case '}':
+										opened--;
+										break;
+									case '{':
+										opened++;
+										break;
+									default:
+										break;
+								}
+							}
+						}
+						break;
+					case '}':
+						if (JmpBack())
+						{
+							int closed = 1;
+							while (closed > 0)
+							{
+								opcode = src[--pc-1];
+								switch (opcode)
+								{
+									case '{':
+										closed--;
+										break;
+									case '}':
+										closed++;
+										break;
+									default:
+										break;
+								}
+							}
+						}
+						break;
+					default:
+						break;
+				}
+			}
 		}
 
 		public void PointerInc()
@@ -150,6 +243,15 @@ namespace Mirage
 			SetWord(input);
 		}
 		
+		public bool JmpForward()
+		{
+			return ((pointerHi == pointerLo) || WordIsZero());
+		}
+		public bool JmpBack()
+		{
+			return ((pointerHi != pointerLo) && !WordIsZero());
+		}
+
 		private byte[] GetWord()
 		{
 			if (pointerHi == pointerLo)
@@ -200,6 +302,20 @@ namespace Mirage
 				pointer += pointerDelta;
 				counter++;
 			} 
+		}
+		private bool WordIsZero()
+		{
+			byte[] word = GetWord();
+
+			foreach (var b in word)
+			{
+				if (b != 0)
+				{
+					return false;
+				}
+			}
+
+			return true;
 		}
 		private byte[] GetArgument()
 		{

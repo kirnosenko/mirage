@@ -8,7 +8,7 @@ namespace Mirage
 	{
 		static void Main(string[] args)
 		{
-			Interpreter interpreter = new Interpreter();
+			Machine machine = new Machine(64 * 1024);
 			string src;
 			
 			if (args.Length > 0)
@@ -18,14 +18,14 @@ namespace Mirage
 					using (TextReader file = new StreamReader(args[0]))
 					{
 						src = file.ReadToEnd();
-						interpreter.Interpret(src);
+						machine.Run(src);
 					}
 				}
 			}
 			
 			while ((src = GetCmd()) != null)
 			{
-				interpreter.Interpret(src);
+				machine.Run(src);
 			}
 		}
 		static string GetCmd()

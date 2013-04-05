@@ -15,6 +15,16 @@ namespace Mirage.Tests
 			m = new Machine(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
 		}
 		[Test]
+		public void Should_reset_pointers()
+		{
+			m.PointerInc();
+			m.PointerInc();
+
+			m.Reset();
+			m.Output()
+				.Should().Have.SameSequenceAs(new byte[] { });
+		}
+		[Test]
 		public void Output_size_is_equel_to_word_size()
 		{
 			m.Output().Length
@@ -135,7 +145,7 @@ namespace Mirage.Tests
 				.Should().Have.SameSequenceAs(new byte[] { 1, 255 });
 		}
 		[Test]
-		public void Shlould_do_logic_shift_of_the_word()
+		public void Should_do_logic_shift_of_the_word()
 		{
 			m.PointerInc();
 			m.Inc();
@@ -160,6 +170,14 @@ namespace Mirage.Tests
 			m.Shr();
 			m.Output()
 				.Should().Have.SameSequenceAs(new byte[] { 64, 0 });
+		}
+		[Test]
+		public void Can_run_in_cycle()
+		{
+			m.Run("]+<<+{-]}+");
+
+			m.Output()
+				.Should().Have.SameSequenceAs(new byte[] { 1, 0, 0, 0, 0, 0 });
 		}
 	}
 }
