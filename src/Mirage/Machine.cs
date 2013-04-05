@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 
 namespace Mirage
 {
@@ -66,10 +65,10 @@ namespace Mirage
 						Shl();
 						break;
 					case '!':
-						Console.Write(ASCIIEncoding.ASCII.GetString(Output()));
+						Output(GetWord());
 						break;
 					case '?':
-						Input(UTF8Encoding.Unicode.GetBytes(Console.ReadLine()));
+						SetWord(Input());
 						break;
 					case '{':
 						if (JmpForward())
@@ -118,22 +117,30 @@ namespace Mirage
 				}
 			}
 		}
+		public Action<byte[]> Output
+		{
+			get; set;
+		}
+		public Func<byte[]> Input
+		{
+			get; set;
+		}
 
-		public void PointerInc()
+		protected void PointerInc()
 		{
 			pointerHi++;
 		}
-		public void PointerDec()
+		protected void PointerDec()
 		{
 			pointerHi--;
 		}
-		public void XchPointers()
+		protected void XchPointers()
 		{
 			int temp = pointerLo;
 			pointerLo = pointerHi;
 			pointerHi = temp;
 		}
-		public void LoadPointer()
+		protected void LoadPointer()
 		{
 			if (pointerHi == pointerLo)
 			{
@@ -150,12 +157,12 @@ namespace Mirage
 				counter--;
 			}
 		}
-		public void DragPointer()
+		protected void DragPointer()
 		{
 			pointerLo = pointerHi;
 		}
 
-		public void Inc()
+		protected void Inc()
 		{
 			byte[] word = GetWord();
 
@@ -171,7 +178,7 @@ namespace Mirage
 
 			SetWord(word);
 		}
-		public void Dec()
+		protected void Dec()
 		{
 			byte[] word = GetWord();
 
@@ -188,7 +195,7 @@ namespace Mirage
 			SetWord(word);
 		}
 
-		public void Not()
+		protected void Not()
 		{
 			byte[] word = GetWord();
 
@@ -201,7 +208,7 @@ namespace Mirage
 
 			SetWord(word);
 		}
-		public void Shr()
+		protected void Shr()
 		{
 			byte[] word = GetWord();
 
@@ -217,7 +224,7 @@ namespace Mirage
 
 			SetWord(word);
 		}
-		public void Shl()
+		protected void Shl()
 		{
 			byte[] word = GetWord();
 
@@ -234,25 +241,16 @@ namespace Mirage
 			SetWord(word);
 		}
 
-		public byte[] Output()
-		{
-			return GetWord();
-		}
-		public void Input(byte[] input)
-		{
-			SetWord(input);
-		}
-		
-		public bool JmpForward()
+		protected bool JmpForward()
 		{
 			return ((pointerHi == pointerLo) || WordIsZero());
 		}
-		public bool JmpBack()
+		protected bool JmpBack()
 		{
 			return ((pointerHi != pointerLo) && !WordIsZero());
 		}
 
-		private byte[] GetWord()
+		protected byte[] GetWord()
 		{
 			if (pointerHi == pointerLo)
 			{
@@ -279,7 +277,7 @@ namespace Mirage
 
 			return word;
 		}
-		private void SetWord(byte[] word)
+		protected void SetWord(byte[] word)
 		{
 			if ((pointerHi == pointerLo) || (word.Length == 0))
 			{
@@ -303,7 +301,7 @@ namespace Mirage
 				counter++;
 			} 
 		}
-		private bool WordIsZero()
+		protected bool WordIsZero()
 		{
 			byte[] word = GetWord();
 
@@ -316,10 +314,6 @@ namespace Mirage
 			}
 
 			return true;
-		}
-		private byte[] GetArgument()
-		{
-			return null;
 		}
 	}
 }
