@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 
@@ -23,6 +24,10 @@ namespace Mirage.Cmd
 					{
 						src = file.ReadToEnd();
 						machine.Run(src);
+
+						//Stopwatch time = Stopwatch.StartNew();
+						//machine.Run(src);
+						//Console.WriteLine("Done at {0} milliseconds.", time.ElapsedMilliseconds);
 					}
 				}
 			}

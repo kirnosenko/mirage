@@ -55,6 +55,9 @@ namespace Mirage
 					case '-':
 						Dec();
 						break;
+					case '_':
+						Clear();
+						break;
 					case '~':
 						Not();
 						break;
@@ -69,6 +72,9 @@ namespace Mirage
 						break;
 					case '|':
 						Or();
+						break;
+					case '^':
+						Xor();
 						break;
 					case '!':
 						Output();
@@ -201,6 +207,19 @@ namespace Mirage
 			SetWord(word);
 		}
 
+		protected void Clear()
+		{
+			byte[] word = GetWord();
+
+			int counter = 0;
+			while (counter < word.Length)
+			{
+				word[counter] = 0;
+				counter++;
+			}
+
+			SetWord(word);
+		}
 		protected void Not()
 		{
 			byte[] word = GetWord();
@@ -269,6 +288,20 @@ namespace Mirage
 			while (counter < word.Length)
 			{
 				word[counter] = (byte)(word[counter] | argument[counter]);
+				counter++;
+			}
+
+			SetWord(word);
+		}
+		protected void Xor()
+		{
+			byte[] word = GetWord();
+			byte[] argument = GetArgument();
+
+			int counter = 0;
+			while (counter < word.Length)
+			{
+				word[counter] = (byte)(word[counter] ^ argument[counter]);
 				counter++;
 			}
 

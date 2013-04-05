@@ -123,6 +123,15 @@ namespace Mirage.Tests
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 255, 254, 255 });
 		}
 		[Test]
+		public void Should_clear_the_word()
+		{
+			m = new Machine(new byte[] { 255, 100, 10 });
+			m.ByteOutput = output;
+
+			m.Run("]]]_!");
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0, 0, 0 });
+		}
+		[Test]
 		public void Should_invert_the_word()
 		{
 			m.Run("]+~!");
@@ -160,6 +169,15 @@ namespace Mirage.Tests
 
 			m.Run("]]=]]|!");
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x3F, 0xFB });
+		}
+		[Test]
+		public void Should_do_logic_xor()
+		{
+			m = new Machine(new byte[] { 0x0F, 0x7A, 0x38, 0xF1 });
+			m.ByteOutput = output;
+
+			m.Run("]]=]]^!");
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x37, 0x8B });
 		}
 		[Test]
 		public void Can_run_in_cycle()
