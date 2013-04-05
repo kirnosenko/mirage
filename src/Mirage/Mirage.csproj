@@ -37,6 +37,10 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsciiConsoleInput.cs" />
+    <Compile Include="AsciiConsoleOutput.cs" />
+    <Compile Include="IByteInput.cs" />
+    <Compile Include="IByteOutput.cs" />
     <Compile Include="Machine.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

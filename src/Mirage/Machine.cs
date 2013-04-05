@@ -65,10 +65,10 @@ namespace Mirage
 						Shl();
 						break;
 					case '!':
-						Output(GetWord());
+						Output();
 						break;
 					case '?':
-						SetWord(Input());
+						Input();
 						break;
 					case '{':
 						if (JmpForward())
@@ -117,11 +117,11 @@ namespace Mirage
 				}
 			}
 		}
-		public Action<byte[]> Output
+		public IByteOutput ByteOutput
 		{
 			get; set;
 		}
-		public Func<byte[]> Input
+		public IByteInput ByteInput
 		{
 			get; set;
 		}
@@ -239,6 +239,35 @@ namespace Mirage
 			}
 
 			SetWord(word);
+		}
+
+		protected void Output()
+		{
+			if (ByteOutput != null)
+			{
+				byte[] word = GetWord();
+				int counter = 0;
+
+				while (counter < word.Length)
+				{
+					ByteOutput.Output(word[counter]);
+					counter++;
+				}
+			}
+		}
+		protected void Input()
+		{
+			if (ByteInput != null)
+			{
+				byte[] word = new byte[Math.Abs(pointerHi - pointerLo)];
+				int counter = 0;
+
+				while (counter < word.Length)
+				{
+					word[counter] = ByteInput.Input();
+					counter++;
+				}
+			}
 		}
 
 		protected bool JmpForward()

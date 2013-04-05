@@ -8,9 +8,11 @@ namespace Mirage
 	{
 		static void Main(string[] args)
 		{
+			Console.Title = "Mirage 0.0.1 alpha";
+
 			Machine machine = new Machine(64 * 1024);
-			machine.Input = () => UTF8Encoding.Unicode.GetBytes(Console.ReadLine());
-			machine.Output = (o) => Console.Write(ASCIIEncoding.ASCII.GetString(o));
+			machine.ByteInput = new AsciiConsoleInput();
+			machine.ByteOutput = new AsciiConsoleOutput();
 			string src;
 			
 			if (args.Length > 0)
