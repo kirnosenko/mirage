@@ -92,7 +92,7 @@ namespace Mirage
 						Input();
 						break;
 					case '{':
-						if (JmpForward())
+						if (Jmp())
 						{
 							int opened = 1;
 							while (opened > 0)
@@ -113,23 +113,21 @@ namespace Mirage
 						}
 						break;
 					case '}':
-						if (JmpBack())
+						pc--;
+						int closed = 1;
+						while (closed > 0)
 						{
-							int closed = 1;
-							while (closed > 0)
+							opcode = src[--pc];
+							switch (opcode)
 							{
-								opcode = src[--pc-1];
-								switch (opcode)
-								{
-									case '{':
-										closed--;
-										break;
-									case '}':
-										closed++;
-										break;
-									default:
-										break;
-								}
+								case '{':
+									closed--;
+									break;
+								case '}':
+									closed++;
+									break;
+								default:
+									break;
 							}
 						}
 						break;
@@ -384,15 +382,11 @@ namespace Mirage
 			}
 		}
 
-		protected bool JmpForward()
+		protected bool Jmp()
 		{
 			return ((pointerHi == pointerLo) || WordIsZero());
 		}
-		protected bool JmpBack()
-		{
-			return ((pointerHi != pointerLo) && !WordIsZero());
-		}
-
+		
 		protected byte[] GetWord()
 		{
 			if (pointerHi == pointerLo)
