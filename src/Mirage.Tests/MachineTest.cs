@@ -194,6 +194,30 @@ namespace Mirage.Tests
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x3F, 0xFB });
 		}
 		[Test]
+		public void Should_add_operand_to_word()
+		{
+			m = new Machine(new byte[] { 200, 20, 200, 40 });
+			m.ByteOutput = output;
+
+			m.Run("]]=]]+!");
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 144, 61 });
+
+			m.Run("#+!");
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 81, 88});
+		}
+		[Test]
+		public void Should_sub_operand_from_word()
+		{
+			m = new Machine(new byte[] { 200, 20, 200, 50 });
+			m.ByteOutput = output;
+
+			m.Run("]]=]]-!");
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0, 30 });
+
+			m.Run("#-!");
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 246, 199 });
+		}
+		[Test]
 		public void Can_run_in_cycle()
 		{
 			m.Run("])<<){(]})!");

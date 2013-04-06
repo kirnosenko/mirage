@@ -79,6 +79,12 @@ namespace Mirage
 					case '|':
 						Or();
 						break;
+					case '+':
+						Add();
+						break;
+					case '-':
+						Sub();
+						break;
 					case '!':
 						Output();
 						break;
@@ -304,6 +310,48 @@ namespace Mirage
 			while (counter < word.Length)
 			{
 				word[counter] = (byte)(word[counter] | argument[counter]);
+				counter++;
+			}
+
+			SetWord(word);
+		}
+		protected void Add()
+		{
+			byte[] word = GetWord();
+			byte[] argument = GetArgument();
+
+			int counter = 0;
+			int carry = 0;
+			while (counter < word.Length)
+			{
+				int sum = word[counter] + argument[counter] + carry;
+				word[counter] = (byte)(sum & 0xFF);
+				carry = sum >> 8;
+				counter++;
+			}
+
+			SetWord(word);
+		}
+		protected void Sub()
+		{
+			byte[] word = GetWord();
+			byte[] argument = GetArgument();
+
+			int counter = 0;
+			int carry = 0;
+			while (counter < word.Length)
+			{
+				int sum = word[counter] - argument[counter] - carry;
+				if (sum >= 0)
+				{
+					carry = 0;
+				}
+				else
+				{
+					sum += 256;
+					carry++;
+				}
+				word[counter] = (byte)(sum & 0xFF);
 				counter++;
 			}
 
