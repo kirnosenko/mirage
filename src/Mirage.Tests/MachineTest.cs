@@ -152,18 +152,6 @@ namespace Mirage.Tests
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 1, 255 });
 		}
 		[Test]
-		public void Can_exchange_word_and_argument()
-		{
-			m = new Machine(new byte[] { 1, 2, 3, 4 });
-			m.ByteOutput = output;
-
-			m.Run("]]=]]^!");
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 1, 2 });
-
-			m.Run("#!");
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 4, 3 });
-		}
-		[Test]
 		public void Should_do_logic_shift_of_the_word()
 		{
 			m.Run("])<<<!");
@@ -192,6 +180,20 @@ namespace Mirage.Tests
 
 			m.Run("]]=]]|!");
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x3F, 0xFB });
+		}
+		[Test]
+		public void Should_do_logic_xor()
+		{
+			m = new Machine(new byte[] { 0x0F, 0x7A, 0x38, 0xF1 });
+			m.ByteOutput = output;
+
+			m.Run("]]=]]^!");
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x37, 0x8B });
+
+			m.Run("^#^#^!");
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x0F, 0x7A });
+			m.Run("#!");
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x8B, 0x37 });
 		}
 		[Test]
 		public void Should_add_operand_to_word()

@@ -70,14 +70,14 @@ namespace Mirage
 					case '<':
 						Shl();
 						break;
-					case '^':
-						Xch();
-						break;
 					case '&':
 						And();
 						break;
 					case '|':
 						Or();
+						break;
+					case '^':
+						Xor();
 						break;
 					case '+':
 						Add();
@@ -279,14 +279,6 @@ namespace Mirage
 			SetWord(word);
 		}
 
-		protected void Xch()
-		{
-			byte[] word = GetWord();
-			byte[] argument = GetArgument();
-
-			SetWord(argument);
-			SetArgument(word);
-		}
 		protected void And()
 		{
 			byte[] word = GetWord();
@@ -310,6 +302,20 @@ namespace Mirage
 			while (counter < word.Length)
 			{
 				word[counter] = (byte)(word[counter] | argument[counter]);
+				counter++;
+			}
+
+			SetWord(word);
+		}
+		protected void Xor()
+		{
+			byte[] word = GetWord();
+			byte[] argument = GetArgument();
+
+			int counter = 0;
+			while (counter < word.Length)
+			{
+				word[counter] = (byte)(word[counter] ^ argument[counter]);
 				counter++;
 			}
 
@@ -494,37 +500,6 @@ namespace Mirage
 			} while (pointer != endPoiner);
 
 			return argument;
-		}
-		protected void SetArgument(byte[] argument)
-		{
-			if ((pointerHi == pointerLo) || (argument.Length == 0))
-			{
-				return;
-			}
-			int pointerDelta = pointerHi > pointerLo ? 1 : -1;
-			int startPointer = pointerLo;
-			int endPoiner = pointerHi;
-			if (pointerDelta < 0)
-			{
-				startPointer -= 1;
-				endPoiner -= 1;
-				startPointer += Math.Abs(pointerHi - pointerLo);
-				endPoiner += Math.Abs(pointerHi - pointerLo);
-			}
-			else
-			{
-				startPointer -= Math.Abs(pointerHi - pointerLo);
-				endPoiner -= Math.Abs(pointerHi - pointerLo);
-			}
-
-			int pointer = startPointer;
-			int counter = 0;
-			while ((pointer != endPoiner) && (counter < argument.Length))
-			{
-				memory[pointer] = argument[counter];
-				pointer += pointerDelta;
-				counter++;
-			}
 		}
 	}
 }
