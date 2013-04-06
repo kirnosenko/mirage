@@ -81,6 +81,17 @@ namespace Mirage.Tests
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 2, 1, 0 });
 		}
 		[Test]
+		public void Should_reflect_hi_pointer_relative_to_lo_pointer()
+		{
+			m.Run("]]]~%");
+
+			m.Run("#!");
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0, 0, 0 });
+
+			m.Run("#!");
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 255, 255, 255 });
+		}
+		[Test]
 		public void Shloud_load_hi_pointer_from_word()
 		{
 			byte[] data = new byte[600];

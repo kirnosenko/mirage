@@ -35,19 +35,22 @@ namespace Mirage
 				switch (opcode)
 				{
 					case ']':
-						PointerInc();
+						IncHiPointer();
 						break;
 					case '[':
-						PointerDec();
+						DecHiPointer();
+						break;
+					case '#':
+						ReflectHiPointer();
+						break;
+					case '$':
+						LoadHiPointer();
+						break;
+					case '=':
+						DragLoPointer();
 						break;
 					case '%':
 						XchPointers();
-						break;
-					case '$':
-						LoadPointer();
-						break;
-					case '=':
-						DragPointer();
 						break;
 					case '+':
 						Inc();
@@ -138,21 +141,19 @@ namespace Mirage
 			get; set;
 		}
 
-		protected void PointerInc()
+		protected void IncHiPointer()
 		{
 			pointerHi++;
 		}
-		protected void PointerDec()
+		protected void DecHiPointer()
 		{
 			pointerHi--;
 		}
-		protected void XchPointers()
+		protected void ReflectHiPointer()
 		{
-			int temp = pointerLo;
-			pointerLo = pointerHi;
-			pointerHi = temp;
+			pointerHi = pointerLo - (pointerHi - pointerLo);
 		}
-		protected void LoadPointer()
+		protected void LoadHiPointer()
 		{
 			if (pointerHi == pointerLo)
 			{
@@ -169,9 +170,15 @@ namespace Mirage
 				counter--;
 			}
 		}
-		protected void DragPointer()
+		protected void DragLoPointer()
 		{
 			pointerLo = pointerHi;
+		}
+		protected void XchPointers()
+		{
+			int temp = pointerLo;
+			pointerLo = pointerHi;
+			pointerHi = temp;
 		}
 
 		protected void Inc()
