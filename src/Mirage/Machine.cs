@@ -52,10 +52,10 @@ namespace Mirage
 					case '%':
 						XchPointers();
 						break;
-					case '+':
+					case ')':
 						Inc();
 						break;
-					case '-':
+					case '(':
 						Dec();
 						break;
 					case '_':

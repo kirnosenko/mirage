@@ -100,23 +100,23 @@ namespace Mirage.Tests
 
 			m = new Machine(data);
 			m.ByteOutput = output;
-			m.Run("]]+<<<<<<<<<$=]]!");
+			m.Run("]])<<<<<<<<<$=]]!");
 
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 255, 255 });
 		}
 		[Test]
 		public void Should_increment_word()
 		{
-			m.Run("]+!");
+			m.Run("])!");
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 1 });
 
-			m.Run("+!");
+			m.Run(")!");
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 2 });
 
 			m.Run("]");
 			for (int i = 0; i < 256; i++)
 			{
-				m.Run("+");
+				m.Run(")");
 			}
 			m.Run("!");
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 2, 1 });
@@ -127,10 +127,10 @@ namespace Mirage.Tests
 			m = new Machine(new byte[] { 0, 0, 1 });
 			m.ByteOutput = output;
 
-			m.Run("]]]-!");
+			m.Run("]]](!");
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 255, 255, 0 });
 
-			m.Run("%-!");
+			m.Run("%(!");
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 255, 254, 255 });
 		}
 		[Test]
@@ -145,7 +145,7 @@ namespace Mirage.Tests
 		[Test]
 		public void Should_invert_the_word()
 		{
-			m.Run("]+~!");
+			m.Run("])~!");
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 254 });
 
 			m.Run("]~!");
@@ -166,7 +166,7 @@ namespace Mirage.Tests
 		[Test]
 		public void Should_do_logic_shift_of_the_word()
 		{
-			m.Run("]+<<<!");
+			m.Run("])<<<!");
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 8 });
 
 			m.Run("]<<<<<<!");
@@ -196,7 +196,7 @@ namespace Mirage.Tests
 		[Test]
 		public void Can_run_in_cycle()
 		{
-			m.Run("]+<<+{-]}+!");
+			m.Run("])<<){(]})!");
 
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 1, 0, 0, 0, 0, 0 });
 		}
