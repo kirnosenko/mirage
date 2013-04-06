@@ -98,14 +98,17 @@ namespace Mirage.Tests
 		public void Shloud_load_hi_pointer_from_word()
 		{
 			byte[] data = new byte[600];
-			data[512] = 255;
+			data[512] = 254;
 			data[513] = 255;
 
 			m = new Machine(data);
 			m.OutputChannel = output;
 			m.Run("]])<<<<<<<<<$=]]!");
 
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 255, 255 });
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 254, 255 });
+
+			m.Run("=$=]]!");
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0, 2 });
 		}
 		[Test]
 		public void Should_increment_word()

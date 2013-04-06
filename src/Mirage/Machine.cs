@@ -163,8 +163,10 @@ namespace Mirage
 		{
 			if (pointerHi == pointerLo)
 			{
+				pointerHi = 0;
 				return;
 			}
+
 			byte[] word = GetWord();
 			pointerHi = 0;
 			
