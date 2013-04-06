@@ -1,0 +1,3 @@
+﻿Copy input to output
+
+]){?!}

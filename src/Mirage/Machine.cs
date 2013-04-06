@@ -138,11 +138,11 @@ namespace Mirage
 				}
 			}
 		}
-		public IByteOutput ByteOutput
+		public IInputOutputChannel OutputChannel
 		{
 			get; set;
 		}
-		public IByteInput ByteInput
+		public IInputOutputChannel InputChannel
 		{
 			get; set;
 		}
@@ -366,30 +366,19 @@ namespace Mirage
 
 		protected void Output()
 		{
-			if (ByteOutput != null)
+			if (OutputChannel != null)
 			{
 				byte[] word = GetWord();
-				int counter = 0;
-
-				while (counter < word.Length)
-				{
-					ByteOutput.Output(word[counter]);
-					counter++;
-				}
+				OutputChannel.InputOutput(word);
 			}
 		}
 		protected void Input()
 		{
-			if (ByteInput != null)
+			if (InputChannel != null)
 			{
 				byte[] word = new byte[Math.Abs(pointerHi - pointerLo)];
-				int counter = 0;
-
-				while (counter < word.Length)
-				{
-					word[counter] = ByteInput.Input();
-					counter++;
-				}
+				InputChannel.InputOutput(word);
+				SetWord(word);
 			}
 		}
 

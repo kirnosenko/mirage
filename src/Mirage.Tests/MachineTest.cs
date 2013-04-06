@@ -9,13 +9,16 @@ namespace Mirage.Tests
 	[TestFixture]
 	public class MachineTest
 	{
-		public class DebugOutput : IByteOutput
+		public class DebugOutput : IInputOutputChannel
 		{
 			private List<byte> buffer = new List<byte>(64 * 1024);
 
-			public void Output(byte value)
+			public void InputOutput(byte[] data)
 			{
-				buffer.Add(value);
+				foreach (var b in data)
+				{
+					buffer.Add(b);
+				}
 			}
 			public byte[] GetAndClear
 			{
@@ -36,7 +39,7 @@ namespace Mirage.Tests
 		{
 			m = new Machine(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
 			output = new DebugOutput();
-			m.ByteOutput = output;
+			m.OutputChannel = output;
 		}
 		[Test]
 		public void Should_reset_pointers()
@@ -66,7 +69,7 @@ namespace Mirage.Tests
 		public void Word_is_byte_sequence_from_lo_pointer_to_hi_one()
 		{
 			m = new Machine(new byte[] { 0, 1, 2 });
-			m.ByteOutput = output;
+			m.OutputChannel = output;
 
 			m.Run("]!");
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0 });
@@ -99,7 +102,7 @@ namespace Mirage.Tests
 			data[513] = 255;
 
 			m = new Machine(data);
-			m.ByteOutput = output;
+			m.OutputChannel = output;
 			m.Run("]])<<<<<<<<<$=]]!");
 
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 255, 255 });
@@ -125,7 +128,7 @@ namespace Mirage.Tests
 		public void Should_decrement_word()
 		{
 			m = new Machine(new byte[] { 0, 0, 1 });
-			m.ByteOutput = output;
+			m.OutputChannel = output;
 
 			m.Run("]]](!");
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 255, 255, 0 });
@@ -137,7 +140,7 @@ namespace Mirage.Tests
 		public void Should_clear_the_word()
 		{
 			m = new Machine(new byte[] { 255, 100, 10 });
-			m.ByteOutput = output;
+			m.OutputChannel = output;
 
 			m.Run("]]]_!");
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0, 0, 0 });
@@ -167,7 +170,7 @@ namespace Mirage.Tests
 		public void Should_do_logic_and()
 		{
 			m = new Machine(new byte[] { 0x0F, 0x7A, 0x38, 0xF2 });
-			m.ByteOutput = output;
+			m.OutputChannel = output;
 
 			m.Run("]]=]]&!");
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x08, 0x72 });
@@ -176,7 +179,7 @@ namespace Mirage.Tests
 		public void Should_do_logic_or()
 		{
 			m = new Machine(new byte[] { 0x0F, 0x7A, 0x38, 0xF1 });
-			m.ByteOutput = output;
+			m.OutputChannel = output;
 
 			m.Run("]]=]]|!");
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x3F, 0xFB });
@@ -185,7 +188,7 @@ namespace Mirage.Tests
 		public void Should_do_logic_xor()
 		{
 			m = new Machine(new byte[] { 0x0F, 0x7A, 0x38, 0xF1 });
-			m.ByteOutput = output;
+			m.OutputChannel = output;
 
 			m.Run("]]=]]^!");
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x37, 0x8B });
@@ -199,7 +202,7 @@ namespace Mirage.Tests
 		public void Should_add_operand_to_word()
 		{
 			m = new Machine(new byte[] { 200, 20, 200, 40 });
-			m.ByteOutput = output;
+			m.OutputChannel = output;
 
 			m.Run("]]=]]+!");
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 144, 61 });
@@ -211,7 +214,7 @@ namespace Mirage.Tests
 		public void Should_sub_operand_from_word()
 		{
 			m = new Machine(new byte[] { 200, 20, 200, 50 });
-			m.ByteOutput = output;
+			m.OutputChannel = output;
 
 			m.Run("]]=]]-!");
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0, 30 });

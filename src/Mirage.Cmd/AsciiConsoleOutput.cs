@@ -2,11 +2,14 @@
 
 namespace Mirage.Cmd
 {
-	public class AsciiConsoleOutput : IByteOutput
+	public class AsciiConsoleOutput : IInputOutputChannel
 	{
-		public void Output(byte value)
+		public void InputOutput(byte[] data)
 		{
-			Console.Write(Convert.ToChar(value));
+			foreach (var b in data)
+			{
+				Console.Write(Convert.ToChar(b));
+			}
 		}
 	}
 }

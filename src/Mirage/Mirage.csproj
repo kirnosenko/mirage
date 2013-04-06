@@ -35,8 +35,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IByteInput.cs" />
-    <Compile Include="IByteOutput.cs" />
+    <Compile Include="IInputOutputChannel.cs" />
     <Compile Include="Machine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

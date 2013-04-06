@@ -12,8 +12,8 @@ namespace Mirage.Cmd
 			Console.Title = "Mirage 0.0.1 alpha";
 
 			Machine machine = new Machine(64 * 1024);
-			machine.ByteInput = new AsciiConsoleInput();
-			machine.ByteOutput = new AsciiConsoleOutput();
+			machine.InputChannel = new AsciiConsoleInput();
+			machine.OutputChannel = new AsciiConsoleOutput();
 			string src;
 			
 			if (args.Length > 0)
