@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mirage.Cmd", "Mirage.Cmd\Mi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mirage", "Mirage\Mirage.csproj", "{600B517E-783C-4F75-8BBF-1720AA339C1F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mirage.Cil", "Mirage.Cil\Mirage.Cil.csproj", "{D5FBB843-8650-45F0-9626-12C8356F55BC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{600B517E-783C-4F75-8BBF-1720AA339C1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{600B517E-783C-4F75-8BBF-1720AA339C1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{600B517E-783C-4F75-8BBF-1720AA339C1F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5FBB843-8650-45F0-9626-12C8356F55BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5FBB843-8650-45F0-9626-12C8356F55BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5FBB843-8650-45F0-9626-12C8356F55BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5FBB843-8650-45F0-9626-12C8356F55BC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
