@@ -2,6 +2,7 @@
   <Settings activeconfig="Debug" />
   <Config name="Debug" binpathtype="Auto">
     <assembly path="Mirage.Tests\bin\Debug\Mirage.Tests.dll" />
+    <assembly path="Mirage.Cmd.Tests\bin\Debug\Mirage.Cmd.Tests.dll" />
   </Config>
   <Config name="Release" binpathtype="Auto" />
 </NUnitProject>

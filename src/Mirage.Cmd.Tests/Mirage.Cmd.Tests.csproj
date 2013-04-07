@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{70972B71-BD2B-4899-9348-DB312F1BD7FA}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{45DF807A-640A-4039-8B0B-A282C73E6372}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Mirage.Cmd</RootNamespace>
-    <AssemblyName>Mirage.Cmd</AssemblyName>
+    <AssemblyName>Mirage.Cmd.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -32,16 +30,30 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="nunit.framework, Version=2.6.2.12296, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpTestsEx">
+      <HintPath>..\..\lib\SharpTestsEx.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Interpreter.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="InterpreterTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Mirage.Cmd\Mirage.Cmd.csproj">
+      <Project>{70972b71-bd2b-4899-9348-db312f1bd7fa}</Project>
+      <Name>Mirage.Cmd</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mirage.Tests\Mirage.Tests.csproj">
+      <Project>{ba2b1c44-f11d-451c-8032-3bca904c63fa}</Project>
+      <Name>Mirage.Tests</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Mirage\Mirage.csproj">
       <Project>{600b517e-783c-4f75-8bbf-1720aa339c1f}</Project>
       <Name>Mirage</Name>

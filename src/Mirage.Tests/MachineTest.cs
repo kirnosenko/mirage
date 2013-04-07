@@ -1,38 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using SharpTestsEx;
 
-namespace Mirage.Tests
+namespace Mirage
 {
 	[TestFixture]
 	public class MachineTest
 	{
-		public class DebugOutput : IInputOutputChannel
-		{
-			private List<byte> buffer = new List<byte>(64 * 1024);
-
-			public void InputOutput(byte[] data)
-			{
-				foreach (var b in data)
-				{
-					buffer.Add(b);
-				}
-			}
-			public byte[] GetAndClear
-			{
-				get
-				{
-					byte[] array = buffer.ToArray();
-					buffer.Clear();
-					return array;
-				}
-			} 
-		}
-
-		Machine m;
-		DebugOutput output;
+		private Machine m;
+		private DebugOutput output;
 
 		[SetUp]
 		public void SetUp()
@@ -44,25 +20,29 @@ namespace Mirage.Tests
 		[Test]
 		public void Should_reset_pointers()
 		{
-			m.Run("]]");
+			m.IncHiPointer();
+			m.IncHiPointer();
 			m.Reset();
-			m.Run("!");
+			m.Output();
 
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { });
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] {});
 		}
 		[Test]
 		public void Output_size_is_equel_to_word_size()
 		{
-			m.Run("!");
+			m.Output();
 			output.GetAndClear.Length.Should().Be(0);
 
-			m.Run("]!");
+			m.IncHiPointer();
+			m.Output();
 			output.GetAndClear.Length.Should().Be(1);
 
-			m.Run("]!");
+			m.IncHiPointer();
+			m.Output();
 			output.GetAndClear.Length.Should().Be(2);
 
-			m.Run("]!");
+			m.IncHiPointer();
+			m.Output();
 			output.GetAndClear.Length.Should().Be(3);
 		}
 		[Test]
@@ -71,60 +51,91 @@ namespace Mirage.Tests
 			m = new Machine(new byte[] { 0, 1, 2 });
 			m.OutputChannel = output;
 
-			m.Run("]!");
+			m.IncHiPointer();
+			m.Output();
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0 });
 
-			m.Run("]!");
+			m.IncHiPointer();
+			m.Output();
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0, 1 });
 
-			m.Run("]!");
+			m.IncHiPointer();
+			m.Output();
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0, 1, 2 });
 
-			m.Run("%!");
+			m.XchPointers();
+			m.Output();
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 2, 1, 0 });
 		}
 		[Test]
 		public void Should_reflect_hi_pointer_relative_to_lo_pointer()
 		{
-			m.Run("]]]~%");
+			m = new Machine(new byte[] { 0, 1, 2, 3 });
+			m.OutputChannel = output;
 
-			m.Run("#!");
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0, 0, 0 });
+			m.IncHiPointer();
+			m.IncHiPointer();
+			m.DragLoPointer();
+			m.IncHiPointer();
+			m.IncHiPointer();
+			m.Output();
+			
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 2, 3 });
 
-			m.Run("#!");
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 255, 255, 255 });
+			m.ReflectHiPointer();
+			m.Output();
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 1, 0 });
 		}
 		[Test]
 		public void Shloud_load_hi_pointer_from_word()
 		{
 			byte[] data = new byte[600];
+			data[0] = 0;
+			data[1] = 2;
 			data[512] = 254;
 			data[513] = 255;
 
 			m = new Machine(data);
 			m.OutputChannel = output;
-			m.Run("]])<<<<<<<<<$=]]!");
+
+			m.IncHiPointer();
+			m.IncHiPointer();
+			m.LoadHiPointer();
+			m.DragLoPointer();
+			m.IncHiPointer();
+			m.IncHiPointer();
+			m.Output();
 
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 254, 255 });
 
-			m.Run("=$=]]!");
+			m.DragLoPointer();
+			m.LoadHiPointer();
+			m.DragLoPointer();
+			m.IncHiPointer();
+			m.IncHiPointer();
+			m.Output();
+			
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0, 2 });
 		}
 		[Test]
 		public void Should_increment_word()
 		{
-			m.Run("])!");
+			m.IncHiPointer();
+			m.Inc();
+			m.Output();
+			
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 1 });
 
-			m.Run(")!");
+			m.Inc();
+			m.Output();
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 2 });
 
-			m.Run("]");
+			m.IncHiPointer();
 			for (int i = 0; i < 256; i++)
 			{
-				m.Run(")");
+				m.Inc();
 			}
-			m.Run("!");
+			m.Output();
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 2, 1 });
 		}
 		[Test]
@@ -133,10 +144,16 @@ namespace Mirage.Tests
 			m = new Machine(new byte[] { 0, 0, 1 });
 			m.OutputChannel = output;
 
-			m.Run("]]](!");
+			m.IncHiPointer();
+			m.IncHiPointer();
+			m.IncHiPointer();
+			m.Dec();
+			m.Output();
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 255, 255, 0 });
 
-			m.Run("%(!");
+			m.XchPointers();
+			m.Dec();
+			m.Output();
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 255, 254, 255 });
 		}
 		[Test]
@@ -145,28 +162,52 @@ namespace Mirage.Tests
 			m = new Machine(new byte[] { 255, 100, 10 });
 			m.OutputChannel = output;
 
-			m.Run("]]]_!");
+			m.IncHiPointer();
+			m.IncHiPointer();
+			m.IncHiPointer();
+			m.Clear();
+			m.Output();
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0, 0, 0 });
 		}
 		[Test]
 		public void Should_invert_the_word()
 		{
-			m.Run("])~!");
+			m.IncHiPointer();
+			m.Inc();
+			m.Not();
+			m.Output();
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 254 });
 
-			m.Run("]~!");
+			m.IncHiPointer();
+			m.Not();
+			m.Output();
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 1, 255 });
 		}
 		[Test]
 		public void Should_do_logic_shift_of_the_word()
 		{
-			m.Run("])<<<!");
+			m.IncHiPointer();
+			m.Inc();
+			m.Shl();
+			m.Shl();
+			m.Shl();
+			m.Output();
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 8 });
 
-			m.Run("]<<<<<<!");
+			m.IncHiPointer();
+			m.Shl();
+			m.Shl();
+			m.Shl();
+			m.Shl();
+			m.Shl();
+			m.Shl();
+			m.Output();
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0, 2 });
 
-			m.Run(">>>!");
+			m.Shr();
+			m.Shr();
+			m.Shr();
+			m.Output();
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 64, 0 });
 		}
 		[Test]
@@ -175,7 +216,13 @@ namespace Mirage.Tests
 			m = new Machine(new byte[] { 0x0F, 0x7A, 0x38, 0xF2 });
 			m.OutputChannel = output;
 
-			m.Run("]]=]]&!");
+			m.IncHiPointer();
+			m.IncHiPointer();
+			m.DragLoPointer();
+			m.IncHiPointer();
+			m.IncHiPointer();
+			m.And();
+			m.Output();
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x08, 0x72 });
 		}
 		[Test]
@@ -184,7 +231,13 @@ namespace Mirage.Tests
 			m = new Machine(new byte[] { 0x0F, 0x7A, 0x38, 0xF1 });
 			m.OutputChannel = output;
 
-			m.Run("]]=]]|!");
+			m.IncHiPointer();
+			m.IncHiPointer();
+			m.DragLoPointer();
+			m.IncHiPointer();
+			m.IncHiPointer();
+			m.Or();
+			m.Output();
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x3F, 0xFB });
 		}
 		[Test]
@@ -193,12 +246,25 @@ namespace Mirage.Tests
 			m = new Machine(new byte[] { 0x0F, 0x7A, 0x38, 0xF1 });
 			m.OutputChannel = output;
 
-			m.Run("]]=]]^!");
+			m.IncHiPointer();
+			m.IncHiPointer();
+			m.DragLoPointer();
+			m.IncHiPointer();
+			m.IncHiPointer();
+			m.Xor();
+			m.Output();
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x37, 0x8B });
 
-			m.Run("^#^#^!");
+			m.Xor();
+			m.ReflectHiPointer();
+			m.Xor();
+			m.ReflectHiPointer();
+			m.Xor();
+			m.Output();
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x0F, 0x7A });
-			m.Run("#!");
+			
+			m.ReflectHiPointer();
+			m.Output();
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x8B, 0x37 });
 		}
 		[Test]
@@ -207,10 +273,18 @@ namespace Mirage.Tests
 			m = new Machine(new byte[] { 200, 20, 200, 40 });
 			m.OutputChannel = output;
 
-			m.Run("]]=]]+!");
+			m.IncHiPointer();
+			m.IncHiPointer();
+			m.DragLoPointer();
+			m.IncHiPointer();
+			m.IncHiPointer();
+			m.Add();
+			m.Output();
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 144, 61 });
 
-			m.Run("#+!");
+			m.ReflectHiPointer();
+			m.Add();
+			m.Output();
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 81, 88});
 		}
 		[Test]
@@ -219,18 +293,19 @@ namespace Mirage.Tests
 			m = new Machine(new byte[] { 200, 20, 200, 50 });
 			m.OutputChannel = output;
 
-			m.Run("]]=]]-!");
+			m.IncHiPointer();
+			m.IncHiPointer();
+			m.DragLoPointer();
+			m.IncHiPointer();
+			m.IncHiPointer();
+			m.Sub();
+			m.Output();
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0, 30 });
 
-			m.Run("#-!");
+			m.ReflectHiPointer();
+			m.Sub();
+			m.Output();
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 246, 199 });
-		}
-		[Test]
-		public void Can_run_in_cycle()
-		{
-			m.Run("])<<){(]})!");
-
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 1, 0, 0, 0, 0, 0 });
 		}
 	}
 }

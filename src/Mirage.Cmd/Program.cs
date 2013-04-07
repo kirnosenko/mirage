@@ -11,9 +11,7 @@ namespace Mirage.Cmd
 		{
 			Console.Title = "Mirage 0.0.1 alpha";
 
-			Machine machine = new Machine(64 * 1024);
-			machine.InputChannel = new AsciiConsoleInput();
-			machine.OutputChannel = new AsciiConsoleOutput();
+			Interpreter interpreter = new Interpreter(64 * 1024);
 			string src;
 			
 			if (args.Length > 0)
@@ -23,7 +21,7 @@ namespace Mirage.Cmd
 					using (TextReader file = new StreamReader(args[0]))
 					{
 						src = file.ReadToEnd();
-						machine.Run(src);
+						interpreter.Run(src);
 
 						//Stopwatch time = Stopwatch.StartNew();
 						//machine.Run(src);
@@ -34,7 +32,7 @@ namespace Mirage.Cmd
 			
 			while ((src = GetCmd()) != null)
 			{
-				machine.Run(src);
+				interpreter.Run(src);
 			}
 		}
 		static string GetCmd()

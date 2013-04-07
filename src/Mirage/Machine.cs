@@ -25,117 +25,6 @@ namespace Mirage
 			pointerLo = 0;
 			pointerHi = 0;
 		}
-		public void Run(string src)
-		{
-			int pc = 0;
-			while (pc < src.Length)
-			{
-				char opcode = src[pc++];
-
-				switch (opcode)
-				{
-					case ']':
-						IncHiPointer();
-						break;
-					case '[':
-						DecHiPointer();
-						break;
-					case '#':
-						ReflectHiPointer();
-						break;
-					case '$':
-						LoadHiPointer();
-						break;
-					case '=':
-						DragLoPointer();
-						break;
-					case '%':
-						XchPointers();
-						break;
-					case ')':
-						Inc();
-						break;
-					case '(':
-						Dec();
-						break;
-					case '_':
-						Clear();
-						break;
-					case '~':
-						Not();
-						break;
-					case '>':
-						Shr();
-						break;
-					case '<':
-						Shl();
-						break;
-					case '&':
-						And();
-						break;
-					case '|':
-						Or();
-						break;
-					case '^':
-						Xor();
-						break;
-					case '+':
-						Add();
-						break;
-					case '-':
-						Sub();
-						break;
-					case '!':
-						Output();
-						break;
-					case '?':
-						Input();
-						break;
-					case '{':
-						if (Jmp())
-						{
-							int opened = 1;
-							while (opened > 0)
-							{
-								opcode = src[pc++];
-								switch (opcode)
-								{
-									case '}':
-										opened--;
-										break;
-									case '{':
-										opened++;
-										break;
-									default:
-										break;
-								}
-							}
-						}
-						break;
-					case '}':
-						pc--;
-						int closed = 1;
-						while (closed > 0)
-						{
-							opcode = src[--pc];
-							switch (opcode)
-							{
-								case '{':
-									closed--;
-									break;
-								case '}':
-									closed++;
-									break;
-								default:
-									break;
-							}
-						}
-						break;
-					default:
-						break;
-				}
-			}
-		}
 		public IInputOutputChannel OutputChannel
 		{
 			get; set;
@@ -145,19 +34,19 @@ namespace Mirage
 			get; set;
 		}
 
-		protected void IncHiPointer()
+		public void IncHiPointer()
 		{
 			pointerHi++;
 		}
-		protected void DecHiPointer()
+		public void DecHiPointer()
 		{
 			pointerHi--;
 		}
-		protected void ReflectHiPointer()
+		public void ReflectHiPointer()
 		{
 			pointerHi = pointerLo - (pointerHi - pointerLo);
 		}
-		protected void LoadHiPointer()
+		public void LoadHiPointer()
 		{
 			if (pointerHi == pointerLo)
 			{
@@ -176,18 +65,18 @@ namespace Mirage
 				counter--;
 			}
 		}
-		protected void DragLoPointer()
+		public void DragLoPointer()
 		{
 			pointerLo = pointerHi;
 		}
-		protected void XchPointers()
+		public void XchPointers()
 		{
 			int temp = pointerLo;
 			pointerLo = pointerHi;
 			pointerHi = temp;
 		}
 
-		protected void Inc()
+		public void Inc()
 		{
 			byte[] word = GetWord();
 
@@ -203,7 +92,7 @@ namespace Mirage
 
 			SetWord(word);
 		}
-		protected void Dec()
+		public void Dec()
 		{
 			byte[] word = GetWord();
 
@@ -220,7 +109,7 @@ namespace Mirage
 			SetWord(word);
 		}
 
-		protected void Clear()
+		public void Clear()
 		{
 			byte[] word = GetWord();
 
@@ -233,7 +122,7 @@ namespace Mirage
 
 			SetWord(word);
 		}
-		protected void Not()
+		public void Not()
 		{
 			byte[] word = GetWord();
 
@@ -246,7 +135,7 @@ namespace Mirage
 
 			SetWord(word);
 		}
-		protected void Shr()
+		public void Shr()
 		{
 			byte[] word = GetWord();
 
@@ -262,7 +151,7 @@ namespace Mirage
 
 			SetWord(word);
 		}
-		protected void Shl()
+		public void Shl()
 		{
 			byte[] word = GetWord();
 
@@ -279,7 +168,7 @@ namespace Mirage
 			SetWord(word);
 		}
 
-		protected void And()
+		public void And()
 		{
 			byte[] word = GetWord();
 			byte[] argument = GetArgument();
@@ -293,7 +182,7 @@ namespace Mirage
 
 			SetWord(word);
 		}
-		protected void Or()
+		public void Or()
 		{
 			byte[] word = GetWord();
 			byte[] argument = GetArgument();
@@ -307,7 +196,7 @@ namespace Mirage
 
 			SetWord(word);
 		}
-		protected void Xor()
+		public void Xor()
 		{
 			byte[] word = GetWord();
 			byte[] argument = GetArgument();
@@ -321,7 +210,7 @@ namespace Mirage
 
 			SetWord(word);
 		}
-		protected void Add()
+		public void Add()
 		{
 			byte[] word = GetWord();
 			byte[] argument = GetArgument();
@@ -338,7 +227,7 @@ namespace Mirage
 
 			SetWord(word);
 		}
-		protected void Sub()
+		public void Sub()
 		{
 			byte[] word = GetWord();
 			byte[] argument = GetArgument();
@@ -364,7 +253,7 @@ namespace Mirage
 			SetWord(word);
 		}
 
-		protected void Output()
+		public void Output()
 		{
 			if (OutputChannel != null)
 			{
@@ -372,7 +261,7 @@ namespace Mirage
 				OutputChannel.InputOutput(word);
 			}
 		}
-		protected void Input()
+		public void Input()
 		{
 			if (InputChannel != null)
 			{
@@ -382,7 +271,7 @@ namespace Mirage
 			}
 		}
 
-		protected bool Jmp()
+		public bool Jmp()
 		{
 			return ((pointerHi == pointerLo) || WordIsZero());
 		}
