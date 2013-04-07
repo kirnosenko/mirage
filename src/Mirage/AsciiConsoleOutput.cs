@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Mirage.Cmd
+namespace Mirage
 {
 	public class AsciiConsoleOutput : IInputOutputChannel
 	{

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Mirage.Cmd
+namespace Mirage
 {
 	public class AsciiConsoleInput : IInputOutputChannel
 	{
