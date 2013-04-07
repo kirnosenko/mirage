@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace Mirage
 {
-	public class DebugOutput : IInputOutputChannel
+	public class DebugOutput
 	{
 		private List<byte> buffer = new List<byte>(64 * 1024);
 
-		public void InputOutput(byte[] data)
+		public void Output(byte[] data)
 		{
 			foreach (var b in data)
 			{
@@ -22,6 +22,10 @@ namespace Mirage
 				buffer.Clear();
 				return array;
 			}
+		}
+		public static implicit operator Action<byte[]>(DebugOutput output)
+		{
+			return output.Output;
 		}
 	}
 }

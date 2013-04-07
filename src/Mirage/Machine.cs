@@ -245,20 +245,20 @@ namespace Mirage
 			SetWord(word);
 		}
 
-		public void Output(IInputOutputChannel outputChannel)
+		public void Output(Action<byte[]> output)
 		{
-			if (outputChannel != null)
+			if (output != null)
 			{
 				byte[] word = GetWord();
-				outputChannel.InputOutput(word);
+				output(word);
 			}
 		}
-		public void Input(IInputOutputChannel inputChannel)
+		public void Input(Action<byte[]> input)
 		{
-			if (inputChannel != null)
+			if (input != null)
 			{
 				byte[] word = new byte[Math.Abs(pointerHi - pointerLo)];
-				inputChannel.InputOutput(word);
+				input(word);
 				SetWord(word);
 			}
 		}

@@ -37,7 +37,6 @@
   <ItemGroup>
     <Compile Include="AsciiConsoleInput.cs" />
     <Compile Include="AsciiConsoleOutput.cs" />
-    <Compile Include="IInputOutputChannel.cs" />
     <Compile Include="Machine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

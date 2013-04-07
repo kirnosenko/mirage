@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Mirage
 {
-	public class AsciiConsoleInput : IInputOutputChannel
+	public class AsciiConsoleInput
 	{
 		private Queue<byte> buffer;
 		
@@ -11,7 +11,7 @@ namespace Mirage
 		{
 			buffer = new Queue<byte>(255);
 		}
-		public void InputOutput(byte[] data)
+		public void Input(byte[] data)
 		{
 			if (buffer.Count < data.Length)
 			{

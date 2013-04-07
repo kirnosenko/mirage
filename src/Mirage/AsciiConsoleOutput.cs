@@ -2,9 +2,9 @@
 
 namespace Mirage
 {
-	public class AsciiConsoleOutput : IInputOutputChannel
+	public class AsciiConsoleOutput
 	{
-		public void InputOutput(byte[] data)
+		public void Output(byte[] data)
 		{
 			foreach (var b in data)
 			{

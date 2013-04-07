@@ -5,18 +5,34 @@ namespace Mirage.Cmd
 	public class Interpreter
 	{
 		private Machine machine;
-		private IInputOutputChannel input;
-		private IInputOutputChannel output;
+		private Action<byte[]> input;
+		private Action<byte[]> output;
 		
 		public Interpreter(int memorySize)
 			: this(memorySize, null, null)
 		{
 		}
-		public Interpreter(int memorySize, IInputOutputChannel input, IInputOutputChannel output)
+		public Interpreter(int memorySize, Action<byte[]> input, Action<byte[]> output)
 		{
 			machine = new Machine(memorySize);
-			this.input = input != null ? input : new AsciiConsoleInput();
-			this.output = output != null ? output : new AsciiConsoleOutput();
+			if (input != null)
+			{
+				this.input = input;
+			}
+			else
+			{
+				AsciiConsoleInput consoleInput = new AsciiConsoleInput();
+				this.input = consoleInput.Input;
+			}
+			if (output != null)
+			{
+				this.output = output;
+			}
+			else
+			{
+				AsciiConsoleOutput consoleOutput = new AsciiConsoleOutput();
+				this.output = consoleOutput.Output;
+			}
 		}
 		public void Run(string src)
 		{
