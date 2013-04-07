@@ -10,6 +10,10 @@ namespace Mirage
 		protected byte[] memory;
 		protected int pointerLo, pointerHi;
 
+		public Machine()
+			: this(64 * 1024)
+		{
+		}
 		public Machine(int memorySize)
 		{
 			memory = new byte[memorySize];

@@ -1,21 +1,140 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using Mono.Reflection;
 
 namespace Mirage.Cil
 {
 	public class Compiler
 	{
-		public void Compile(string filename, string src)
+		public void Compile(string assemblyName, string src)
 		{
-			string assemblyName = filename;
+			string filename = assemblyName + ".exe";
 
 			AssemblyBuilder assembly = AppDomain.CurrentDomain.DefineDynamicAssembly(
 				new AssemblyName(assemblyName),
 				AssemblyBuilderAccess.Save
 			);
 			ModuleBuilder module = assembly.DefineDynamicModule(assemblyName, filename);
+			
+			Type[] typesToCopy = Assembly.GetAssembly(typeof(Machine)).GetTypes();
+			foreach (var t in typesToCopy)
+			{		
+				TypeBuilder tb = module.DefineType(t.Name, t.Attributes);
+				/*
+				foreach (var c in t.GetConstructors())
+				{
+					tb.DefineConstructor(
+						c.Attributes,
+						c.CallingConvention, 
+						c.GetParameters().Select(x => x.ParameterType).ToArray()
+					);
+				}
+				*/
+				foreach (var f in t.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+				{
+					tb.DefineField(f.Name, f.FieldType, f.Attributes);
+				}
+
+				foreach (var m in t.GetMethods(BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Instance))
+				{
+					if (m.Module.Assembly == Assembly.GetAssembly(typeof(Machine)))
+					{
+						List<Instruction> list = MethodBodyReader.GetInstructions(m);
+						
+						MethodBuilder mb = tb.DefineMethod(
+							m.Name,
+							m.Attributes,
+							m.CallingConvention,
+							m.ReturnType,
+							m.GetParameters().Select(x => x.ParameterType).ToArray()
+						);
+						
+						ILGenerator gen = mb.GetILGenerator();
+						
+						foreach (var i in list)
+						{
+							if (i.Operand == null)
+							{
+								gen.Emit(i.OpCode);
+							}
+							else
+							{
+								if (i.Operand is byte)
+								{
+									gen.Emit(i.OpCode, (byte)i.Operand);
+								}
+								else if (i.Operand is ConstructorInfo)
+								{
+									gen.Emit(i.OpCode, (ConstructorInfo)i.Operand);
+								}
+								else if (i.Operand is double)
+								{
+									gen.Emit(i.OpCode, (double)i.Operand);
+								}
+								else if (i.Operand is FieldInfo)
+								{
+									gen.Emit(i.OpCode, (FieldInfo)i.Operand);
+								}
+								else if (i.Operand is float)
+								{
+									gen.Emit(i.OpCode, (float)i.Operand);
+								}
+								else if (i.Operand is int)
+								{
+									gen.Emit(i.OpCode, (int)i.Operand);
+								}
+								else if (i.Operand is Label)
+								{
+									gen.Emit(i.OpCode, (Label)i.Operand);
+								}
+								else if (i.Operand is Label[])
+								{
+									gen.Emit(i.OpCode, (Label[])i.Operand);
+								}
+								else if (i.Operand is LocalBuilder)
+								{
+									gen.Emit(i.OpCode, (LocalBuilder)i.Operand);
+								}
+								else if (i.Operand is long)
+								{
+									gen.Emit(i.OpCode, (long)i.Operand);
+								}
+								else if (i.Operand is MethodInfo)
+								{
+									gen.Emit(i.OpCode, (MethodInfo)i.Operand);
+								}
+								else if (i.Operand is sbyte)
+								{
+									gen.Emit(i.OpCode, (sbyte)i.Operand);
+								}
+								else if (i.Operand is short)
+								{
+									gen.Emit(i.OpCode, (short)i.Operand);
+								}
+								else if (i.Operand is SignatureHelper)
+								{
+									gen.Emit(i.OpCode, (SignatureHelper)i.Operand);
+								}
+								else if (i.Operand is string)
+								{
+									gen.Emit(i.OpCode, (string)i.Operand);
+								}
+								else if (i.Operand is Type)
+								{
+									gen.Emit(i.OpCode, (Type)i.Operand);
+								}
+							}
+						}
+						//mb.CreateMethodBody(body, body.Length);
+						gen.Emit(OpCodes.Ret);
+					}
+				}
+				tb.CreateType();
+			}
+			
 			TypeBuilder type = module.DefineType("Program", TypeAttributes.Class | TypeAttributes.Public);
 			FieldBuilder memory = type.DefineField("memory", typeof(byte[]), FieldAttributes.Private | FieldAttributes.Static);
 			FieldBuilder pointer = type.DefineField("pointer", typeof(int), FieldAttributes.Private | FieldAttributes.Static);
@@ -124,7 +243,8 @@ namespace Mirage.Cil
 						}
 				}
 			}
-			
+			ilGen.Emit(OpCodes.Ret);
+
 			type.CreateType();
 			assembly.SetEntryPoint(method, PEFileKinds.ConsoleApplication);
 			assembly.Save(filename);

@@ -7,13 +7,15 @@ namespace Mirage.Cil
 	{
 		static void Main(string[] args)
 		{
+			Console.Title = "Mirage CIL compiler 0.9.0 alpha";
+
 			string srcFilename = "";
 			string assemblyFilename = "";
 			string src = "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.";
 
 			Compiler c = new Compiler();
 			c.CheckSyntax(src);
-			c.Compile("test.exe", src);
+			c.Compile("test", src);
 		}
 	}
 }
