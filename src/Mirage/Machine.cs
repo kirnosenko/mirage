@@ -25,14 +25,6 @@ namespace Mirage
 			pointerLo = 0;
 			pointerHi = 0;
 		}
-		public IInputOutputChannel OutputChannel
-		{
-			get; set;
-		}
-		public IInputOutputChannel InputChannel
-		{
-			get; set;
-		}
 
 		public void IncHiPointer()
 		{
@@ -253,20 +245,20 @@ namespace Mirage
 			SetWord(word);
 		}
 
-		public void Output()
+		public void Output(IInputOutputChannel outputChannel)
 		{
-			if (OutputChannel != null)
+			if (outputChannel != null)
 			{
 				byte[] word = GetWord();
-				OutputChannel.InputOutput(word);
+				outputChannel.InputOutput(word);
 			}
 		}
-		public void Input()
+		public void Input(IInputOutputChannel inputChannel)
 		{
-			if (InputChannel != null)
+			if (inputChannel != null)
 			{
 				byte[] word = new byte[Math.Abs(pointerHi - pointerLo)];
-				InputChannel.InputOutput(word);
+				inputChannel.InputOutput(word);
 				SetWord(word);
 			}
 		}

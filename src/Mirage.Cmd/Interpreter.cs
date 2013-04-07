@@ -5,6 +5,8 @@ namespace Mirage.Cmd
 	public class Interpreter
 	{
 		private Machine machine;
+		private IInputOutputChannel input;
+		private IInputOutputChannel output;
 		
 		public Interpreter(int memorySize)
 			: this(memorySize, null, null)
@@ -13,8 +15,8 @@ namespace Mirage.Cmd
 		public Interpreter(int memorySize, IInputOutputChannel input, IInputOutputChannel output)
 		{
 			machine = new Machine(memorySize);
-			machine.InputChannel = input != null ? input : new AsciiConsoleInput();
-			machine.OutputChannel = output != null ? output : new AsciiConsoleOutput();
+			this.input = input != null ? input : new AsciiConsoleInput();
+			this.output = output != null ? output : new AsciiConsoleOutput();
 		}
 		public void Run(string src)
 		{
@@ -77,10 +79,10 @@ namespace Mirage.Cmd
 						machine.Sub();
 						break;
 					case '!':
-						machine.Output();
+						machine.Output(output);
 						break;
 					case '?':
-						machine.Input();
+						machine.Input(input);
 						break;
 					case '{':
 						if (machine.Jmp())
