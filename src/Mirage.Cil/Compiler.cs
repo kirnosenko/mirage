@@ -18,11 +18,128 @@ namespace Mirage.Cil
 				AssemblyBuilderAccess.Save
 			);
 			ModuleBuilder module = assembly.DefineDynamicModule(assemblyName, filename);
-			
+
 			Type[] typesToCopy = Assembly.GetAssembly(typeof(Machine)).GetTypes();
 			foreach (var t in typesToCopy)
-			{		
+			{
 				TypeBuilder tb = module.DefineType(t.Name, t.Attributes);
+
+				List<FieldBuilder> fields = new List<FieldBuilder>();
+				foreach (var f in t.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+				{
+					FieldBuilder fb = tb.DefineField(f.Name, f.FieldType, f.Attributes);
+					fields.Add(fb);
+				}
+
+				Dictionary<MethodBuilder,MethodInfo> methods = new Dictionary<MethodBuilder,MethodInfo>();
+				foreach (var m in t.GetMethods(BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Instance))
+				{
+					if (m.Module.Assembly == Assembly.GetAssembly(typeof(Machine)))
+					{
+						MethodBuilder mb = tb.DefineMethod(
+							m.Name,
+							m.Attributes,
+							m.CallingConvention,
+							m.ReturnType,
+							m.GetParameters().Select(x => x.ParameterType).ToArray()
+						);
+						ILGenerator gen = mb.GetILGenerator();
+						methods.Add(mb, m);
+					}
+				}
+
+				foreach (var m in methods)
+				{
+					List<Instruction> instructions = MethodBodyReader.GetInstructions(m.Value);
+					ILGenerator gen = m.Key.GetILGenerator();
+					
+					foreach (var i in instructions)
+					{
+						if (i.Operand == null)
+						{
+							if (i.OpCode == OpCodes.Stloc || i.OpCode == OpCodes.Stloc_0 || i.OpCode == OpCodes.Stloc_1 || i.OpCode == OpCodes.Stloc_2 || i.OpCode == OpCodes.Stloc_3 || i.OpCode == OpCodes.Stloc_S)
+							{
+								gen.DeclareLocal(typeof(object));
+							}
+							gen.Emit(i.OpCode);
+						}
+						else
+						{
+							if (i.Operand is byte)
+							{
+								gen.Emit(i.OpCode, (byte)i.Operand);
+							}
+							else if (i.Operand is ConstructorInfo)
+							{
+								gen.Emit(i.OpCode, (ConstructorInfo)i.Operand);
+							}
+							else if (i.Operand is double)
+							{
+								gen.Emit(i.OpCode, (double)i.Operand);
+							}
+							else if (i.Operand is FieldInfo)
+							{
+								var oldField = (i.Operand as FieldInfo);
+								var newField = fields.Where(x => x.Name == oldField.Name).Single();
+								
+								gen.Emit(i.OpCode, newField);
+							}
+							else if (i.Operand is float)
+							{
+								gen.Emit(i.OpCode, (float)i.Operand);
+							}
+							else if (i.Operand is int)
+							{
+								gen.Emit(i.OpCode, (int)i.Operand);
+							}
+							else if (i.Operand is Label)
+							{
+								gen.Emit(i.OpCode, (Label)i.Operand);
+							}
+							else if (i.Operand is Label[])
+							{
+								gen.Emit(i.OpCode, (Label[])i.Operand);
+							}
+							else if (i.Operand is LocalBuilder)
+							{
+								gen.Emit(i.OpCode, (LocalBuilder)i.Operand);
+							}
+							else if (i.Operand is long)
+							{
+								gen.Emit(i.OpCode, (long)i.Operand);
+							}
+							else if (i.Operand is MethodInfo)
+							{
+								var oldMethod = (i.Operand as MethodInfo);
+								var newMethod = methods.Keys.Where(x => x.Name == oldMethod.Name).SingleOrDefault();
+
+								gen.Emit(i.OpCode, (newMethod == null) ? oldMethod : newMethod);
+							}
+							else if (i.Operand is sbyte)
+							{
+								gen.Emit(i.OpCode, (sbyte)i.Operand);
+							}
+							else if (i.Operand is short)
+							{
+								gen.Emit(i.OpCode, (short)i.Operand);
+							}
+							else if (i.Operand is SignatureHelper)
+							{
+								gen.Emit(i.OpCode, (SignatureHelper)i.Operand);
+							}
+							else if (i.Operand is string)
+							{
+								gen.Emit(i.OpCode, (string)i.Operand);
+							}
+							else if (i.Operand is Type)
+							{
+								gen.Emit(i.OpCode, (Type)i.Operand);
+							}
+						}
+					}
+					gen.Emit(OpCodes.Ret);	
+				}
+
 				/*
 				foreach (var c in t.GetConstructors())
 				{
@@ -33,105 +150,7 @@ namespace Mirage.Cil
 					);
 				}
 				*/
-				foreach (var f in t.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
-				{
-					tb.DefineField(f.Name, f.FieldType, f.Attributes);
-				}
 
-				foreach (var m in t.GetMethods(BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Instance))
-				{
-					if (m.Module.Assembly == Assembly.GetAssembly(typeof(Machine)))
-					{
-						List<Instruction> list = MethodBodyReader.GetInstructions(m);
-						
-						MethodBuilder mb = tb.DefineMethod(
-							m.Name,
-							m.Attributes,
-							m.CallingConvention,
-							m.ReturnType,
-							m.GetParameters().Select(x => x.ParameterType).ToArray()
-						);
-						
-						ILGenerator gen = mb.GetILGenerator();
-						
-						foreach (var i in list)
-						{
-							if (i.Operand == null)
-							{
-								gen.Emit(i.OpCode);
-							}
-							else
-							{
-								if (i.Operand is byte)
-								{
-									gen.Emit(i.OpCode, (byte)i.Operand);
-								}
-								else if (i.Operand is ConstructorInfo)
-								{
-									gen.Emit(i.OpCode, (ConstructorInfo)i.Operand);
-								}
-								else if (i.Operand is double)
-								{
-									gen.Emit(i.OpCode, (double)i.Operand);
-								}
-								else if (i.Operand is FieldInfo)
-								{
-									gen.Emit(i.OpCode, (FieldInfo)i.Operand);
-								}
-								else if (i.Operand is float)
-								{
-									gen.Emit(i.OpCode, (float)i.Operand);
-								}
-								else if (i.Operand is int)
-								{
-									gen.Emit(i.OpCode, (int)i.Operand);
-								}
-								else if (i.Operand is Label)
-								{
-									gen.Emit(i.OpCode, (Label)i.Operand);
-								}
-								else if (i.Operand is Label[])
-								{
-									gen.Emit(i.OpCode, (Label[])i.Operand);
-								}
-								else if (i.Operand is LocalBuilder)
-								{
-									gen.Emit(i.OpCode, (LocalBuilder)i.Operand);
-								}
-								else if (i.Operand is long)
-								{
-									gen.Emit(i.OpCode, (long)i.Operand);
-								}
-								else if (i.Operand is MethodInfo)
-								{
-									gen.Emit(i.OpCode, (MethodInfo)i.Operand);
-								}
-								else if (i.Operand is sbyte)
-								{
-									gen.Emit(i.OpCode, (sbyte)i.Operand);
-								}
-								else if (i.Operand is short)
-								{
-									gen.Emit(i.OpCode, (short)i.Operand);
-								}
-								else if (i.Operand is SignatureHelper)
-								{
-									gen.Emit(i.OpCode, (SignatureHelper)i.Operand);
-								}
-								else if (i.Operand is string)
-								{
-									gen.Emit(i.OpCode, (string)i.Operand);
-								}
-								else if (i.Operand is Type)
-								{
-									gen.Emit(i.OpCode, (Type)i.Operand);
-								}
-							}
-						}
-						//mb.CreateMethodBody(body, body.Length);
-						gen.Emit(OpCodes.Ret);
-					}
-				}
 				tb.CreateType();
 			}
 			
