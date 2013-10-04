@@ -45,6 +45,47 @@ namespace Mirage
 			output.GetAndClear.Length.Should().Be(3);
 		}
 		[Test]
+		public void Input_size_is_equel_to_word_size()
+		{
+			int size = 0;
+			Action<byte[]> input = (word) =>
+			{
+				size = word.Length;
+			};
+
+			m.Input(input);
+			size.Should().Be(0);
+
+			m.IncHiPointer();
+			m.IncHiPointer();
+			m.Input(input);
+			size.Should().Be(2);
+
+			m.XchPointers();
+			m.Input(input);
+			size.Should().Be(2);
+		}
+		[Test]
+		public void Should_set_word_size_equal_to_loaded_data_size()
+		{
+			m.LoadData(new byte[] { 1, 2 });
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 1, 2 });
+
+			m.LoadData(new byte[] { 3 });
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 3 });
+
+			m.LoadData(new byte[] { 5, 5, 5 });
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 5, 5, 5 });
+
+			m.XchPointers();
+			m.LoadData(new byte[] { 8, 9 });
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 8, 9 });
+		}
+		[Test]
 		public void Word_is_byte_sequence_from_lo_pointer_to_hi_one()
 		{
 			m = new Machine(new byte[] { 0, 1, 2 });

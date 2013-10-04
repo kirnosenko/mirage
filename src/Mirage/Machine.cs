@@ -266,6 +266,14 @@ namespace Mirage
 				SetWord(word);
 			}
 		}
+		public void LoadData(byte[] word)
+		{
+			int sizeDelta = word.Length - Math.Abs(pointerHi - pointerLo);
+
+			pointerHi += pointerHi >= pointerLo ? sizeDelta : -sizeDelta;
+
+			SetWord(word);
+		}
 
 		public bool Jmp()
 		{

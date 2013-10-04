@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace Mirage.Cmd
 {
@@ -140,10 +141,68 @@ namespace Mirage.Cmd
 							}
 						}
 						break;
+					case '"':
+						int start = pc;
+						int end = start;
+						while (src[pc++] != '"')
+						{
+							end = pc;
+						}
+						machine.LoadData(ParseString(src.Substring(start, end - start)));
+						break;
 					default:
 						break;
 				}
-			}	
+			}
+		}
+		private byte[] ParseString(string str)
+		{
+			if (str.Length == 0)
+			{
+				return new byte[] {};
+			}
+
+			byte[] data = null;
+
+			if (str.StartsWith("0x"))
+			{
+				string hexStr = str.Substring(2, str.Length - 2).TrimStart(new char[] { '0' });
+
+				data = new byte[(hexStr.Length + 1) / 2];
+				for (int i = 0; i < data.Length; i++)
+				{
+					int hexStrPos = hexStr.Length - 1 - i * 2;
+					data[i] = (byte)HexToInt(hexStr[hexStrPos]);
+					if (hexStrPos > 0)
+					{
+						data[i]+= (byte)(HexToInt(hexStr[hexStrPos-1]) * 16);
+					}
+				}
+			}
+
+			if (data == null)
+			{
+				data = Encoding.UTF8.GetBytes(str);
+			}
+
+			return data;
+		}
+		private int HexToInt(char letter)
+		{
+			int code = (int)letter;
+			if ((code > 47) && (code < 58)) // 0..9
+			{
+				return code - 48;
+			}
+			if ((code > 64) && (code < 71)) // A..F
+			{
+				return code - 55;
+			}
+			if ((code > 96) && (code < 103)) // a..f
+			{
+				return code - 87;
+			}
+			return 0;
 		}
 	}
 }
