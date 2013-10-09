@@ -78,7 +78,7 @@ namespace Mirage
 
 			int counter = 0;
 			int carry = 1;
-			while (carry > 0)
+			while (carry > 0 && counter < word.Length)
 			{
 				int sum = word[counter] + carry;
 				carry = sum >= 256 ? 1 : 0;
@@ -94,7 +94,7 @@ namespace Mirage
 
 			int counter = 0;
 			int carry = 1;
-			while (carry > 0)
+			while (carry > 0 && counter < word.Length)
 			{
 				int sum = word[counter] - carry;
 				carry = sum < 0 ? 1 : 0;

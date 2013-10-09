@@ -337,5 +337,32 @@ namespace Mirage
 			m.Output(output);
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 246, 199 });
 		}
+		[Test]
+		public void Should_work_correctly_with_overflow()
+		{
+			m = new Machine(new byte[] { 1, 0, 0xFF, 0xFF });
+
+			m.IncHiPointer();
+			m.IncHiPointer();
+			m.DragLoPointer();
+			m.IncHiPointer();
+			m.IncHiPointer();
+			
+			m.Add();
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0, 0 });
+
+			m.Sub();
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0xFF, 0xFF });
+
+			m.Inc();
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0, 0 });
+
+			m.Dec();
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0xFF, 0xFF });
+		}
 	}
 }
