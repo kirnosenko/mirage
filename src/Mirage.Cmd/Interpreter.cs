@@ -166,7 +166,7 @@ namespace Mirage.Cmd
 
 			if (str.StartsWith("0x"))
 			{
-				string hexStr = str.Substring(2, str.Length - 2).TrimStart(new char[] { '0' });
+				string hexStr = str.Substring(2, str.Length - 2);
 
 				data = new byte[(hexStr.Length + 1) / 2];
 				for (int i = 0; i < data.Length; i++)

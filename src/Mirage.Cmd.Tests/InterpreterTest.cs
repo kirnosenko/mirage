@@ -47,7 +47,7 @@ namespace Mirage.Cmd
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0xFF, 0x0A });
 
 			i.Run("\"0x000f\"!");
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x0F });
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x0F, 0x00 });
 
 			i.Run("\"\"!");
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] {});
