@@ -297,25 +297,6 @@ namespace Mirage
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 81, 88});
 		}
 		[Test]
-		public void Should_sub_operand_from_word()
-		{
-			m = new Machine(new byte[] { 200, 20, 200, 50 });
-
-			m.IncHiPointer();
-			m.IncHiPointer();
-			m.DragLoPointer();
-			m.IncHiPointer();
-			m.IncHiPointer();
-			m.Sub();
-			m.Output(output);
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0, 30 });
-
-			m.ReflectHiPointer();
-			m.Sub();
-			m.Output(output);
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 246, 199 });
-		}
-		[Test]
 		public void Should_work_correctly_with_overflow()
 		{
 			m = new Machine(new byte[] { 1, 0, 0xFF, 0xFF });
@@ -330,7 +311,9 @@ namespace Mirage
 			m.Output(output);
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0, 0 });
 
-			m.Sub();
+			m.Not();
+			m.Add();
+			m.Not();
 			m.Output(output);
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0xFF, 0xFF });
 

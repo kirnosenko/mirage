@@ -93,9 +93,6 @@ namespace Mirage.Cmd
 					case '+':
 						machine.Add();
 						break;
-					case '-':
-						machine.Sub();
-						break;
 					case '!':
 						machine.Output(output);
 						break;

@@ -203,31 +203,6 @@ namespace Mirage
 
 			SetWord(word);
 		}
-		public void Sub()
-		{
-			byte[] word = GetWord();
-			byte[] argument = GetArgument();
-
-			int counter = 0;
-			int carry = 0;
-			while (counter < word.Length)
-			{
-				int sum = word[counter] - argument[counter] - carry;
-				if (sum >= 0)
-				{
-					carry = 0;
-				}
-				else
-				{
-					sum += 256;
-					carry++;
-				}
-				word[counter] = (byte)(sum & 0xFF);
-				counter++;
-			}
-
-			SetWord(word);
-		}
 
 		public void Output(Action<byte[]> output)
 		{
