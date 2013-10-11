@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Text;
 using NUnit.Framework;
 using SharpTestsEx;
@@ -11,13 +12,15 @@ namespace Mirage.Cmd
 	public class InterpreterTest
 	{
 		private Interpreter i;
+		private DebugInput input;
 		private DebugOutput output;
 
 		[SetUp]
 		public void SetUp()
 		{
+			input = new DebugInput();
 			output = new DebugOutput();
-			i = new Interpreter(64 * 1024, null, output);
+			i = new Interpreter(64 * 1024, input, output);
 		}
 		[Test]
 		public void Can_run_program()
@@ -51,6 +54,42 @@ namespace Mirage.Cmd
 
 			i.Run("\"\"!");
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] {});
+		}
+
+		[Test]
+		public void Should_run_hello_world_program()
+		{
+			RunFromFile("../../../../doc/Samples/Hello world.txt");
+			output.GetAndClear.Should().Have.SameSequenceAs(Encoding.UTF8.GetBytes("hello world!"));
+		}
+		[Test]
+		public void Should_run_cat_program()
+		{
+			input.Add(Encoding.UTF8.GetBytes("some text"));
+			RunFromFile("../../../../doc/Samples/Copy input to output.txt");
+			output.GetAndClear.Should().Have.SameSequenceAs(Encoding.UTF8.GetBytes("some text\0"));
+		}
+		[Test]
+		public void Should_run_reverse_program()
+		{
+			RunFromFile("../../../../doc/Samples/Reverse text.txt");
+			output.GetAndClear.Should().Have.SameSequenceAs(Encoding.UTF8.GetBytes("esrever ot txet"));
+		}
+		[Test]
+		public void Should_run_rot13_program()
+		{
+			input.Add(Encoding.UTF8.GetBytes("HELLO"));
+			RunFromFile("../../../../doc/Samples/ROT13.txt");
+			output.GetAndClear.Should().Have.SameSequenceAs(Encoding.UTF8.GetBytes("URYYB\0"));
+		}
+		
+		private void RunFromFile(string fileName)
+		{
+			using (TextReader file = new StreamReader(fileName))
+			{
+				string src = file.ReadToEnd();
+				i.Run(src);
+			}
 		}
 	}
 }

@@ -156,6 +156,7 @@ namespace Mirage.Cmd
 				}
 			}
 		}
+		
 		private byte[] ParseString(string str)
 		{
 			if (str.Length == 0)

@@ -45,6 +45,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DebugInput.cs" />
     <Compile Include="DebugOutput.cs" />
     <Compile Include="MachineTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
