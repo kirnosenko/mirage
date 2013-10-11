@@ -199,28 +199,26 @@ namespace Mirage
 		[Test]
 		public void Should_do_logic_shift_of_the_word()
 		{
-			m.LoadData(new byte[] { 1 });
-			m.Shl();
-			m.Shl();
-			m.Shl();
+			m.LoadData(new byte[] { 0x8F });
+			m.Shift();
+			m.Shift();
+			m.Shift();
 			m.Output(output);
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 8 });
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x78 });
 
 			m.IncHiPointer();
-			m.Shl();
-			m.Shl();
-			m.Shl();
-			m.Shl();
-			m.Shl();
-			m.Shl();
+			m.Shift();
+			m.Shift();
+			m.Shift();
+			m.Shift();
 			m.Output(output);
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0, 2 });
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x80, 0x07 });
 
-			m.Shr();
-			m.Shr();
-			m.Shr();
+			m.XchPointers();
+			m.Shift();
+			m.Shift();
 			m.Output(output);
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 64, 0 });
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x01, 0x20 });
 		}
 		[Test]
 		public void Should_do_logic_and()

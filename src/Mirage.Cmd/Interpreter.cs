@@ -42,13 +42,12 @@ namespace Mirage.Cmd
 			{
 				char opcode = src[pc++];
 
-				// `~!@#$%^&*()-_=+\|[{}];:'"<,.>/?
 				switch (opcode)
 				{
-					case ')':
+					case '>':
 						machine.IncPointers();
 						break;
-					case '(':
+					case '<':
 						machine.DecPointers();
 						break;
 					case ']':
@@ -84,11 +83,8 @@ namespace Mirage.Cmd
 					case '&':
 						machine.And();
 						break;
-					case '>':
-						machine.Shr();
-						break;
-					case '<':
-						machine.Shl();
+					case '^':
+						machine.Shift();
 						break;
 					case '!':
 						machine.Output(output);

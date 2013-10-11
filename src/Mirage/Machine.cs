@@ -142,27 +142,36 @@ namespace Mirage
 
 			SetWord(word);
 		}
-		public void Shift()
+		public void And()
 		{
 			byte[] word = GetWord();
+			byte[] argument = GetArgument();
 
 			int counter = 0;
-			byte carry = 0;
 			while (counter < word.Length)
 			{
-				byte b = word[counter];
-				word[counter] = (byte)(((b << 1) & 0xFF) | carry);
-				carry = (b & 0x80) != 0 ? (byte)1 : (byte)0;
+				word[counter] = (byte)(word[counter] & argument[counter]);
 				counter++;
 			}
 
 			SetWord(word);
 		}
+		public void Shift()
+		{
+			if (pointerHi > pointerLo)
+			{
+				Shl();
+			}
+			else
+			{
+				Shr();
+			}
+		}
 		public void Shr()
 		{
 			byte[] word = GetWord();
 
-			int counter = word.Length-1;
+			int counter = word.Length - 1;
 			byte carry = 0;
 			while (counter >= 0)
 			{
@@ -185,21 +194,6 @@ namespace Mirage
 				byte b = word[counter];
 				word[counter] = (byte)(((b << 1) & 0xFF) | carry);
 				carry = (b & 0x80) != 0 ? (byte)1 : (byte)0;
-				counter++;
-			}
-
-			SetWord(word);
-		}
-
-		public void And()
-		{
-			byte[] word = GetWord();
-			byte[] argument = GetArgument();
-
-			int counter = 0;
-			while (counter < word.Length)
-			{
-				word[counter] = (byte)(word[counter] & argument[counter]);
 				counter++;
 			}
 
