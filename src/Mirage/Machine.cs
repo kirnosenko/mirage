@@ -82,23 +82,6 @@ namespace Mirage
 			pointerHi = temp;
 		}
 
-		public void Inc()
-		{
-			byte[] word = GetWord();
-
-			int counter = 0;
-			int carry = 1;
-			while (carry > 0 && counter < word.Length)
-			{
-				int sum = word[counter] + carry;
-				carry = sum >= 256 ? 1 : 0;
-				word[counter] = (byte)(sum & 0xFF);
-				counter++;
-			}
-
-			SetWord(word);
-		}
-
 		public void Clear()
 		{
 			byte[] word = GetWord();
@@ -112,6 +95,40 @@ namespace Mirage
 
 			SetWord(word);
 		}
+		public void Add()
+		{
+			byte[] word = GetWord();
+			byte[] argument = GetArgument();
+
+			int counter = 0;
+			int carry = 0;
+			while (counter < word.Length)
+			{
+				int sum = word[counter] + argument[counter] + carry;
+				word[counter] = (byte)(sum & 0xFF);
+				carry = sum >> 8;
+				counter++;
+			}
+
+			SetWord(word);
+		}
+		public void Dec()
+		{
+			byte[] word = GetWord();
+
+			int counter = 0;
+			int carry = 1;
+			while (carry > 0 && counter < word.Length)
+			{
+				int sum = word[counter] - carry;
+				carry = sum < 0 ? 1 : 0;
+				word[counter] = sum < 0 ? (byte)0xFF : (byte)(sum & 0xFF);
+				counter++;
+			}
+
+			SetWord(word);
+		}
+
 		public void Not()
 		{
 			byte[] word = GetWord();
@@ -120,6 +137,22 @@ namespace Mirage
 			while (counter < word.Length)
 			{
 				word[counter] = (byte)~word[counter];
+				counter++;
+			}
+
+			SetWord(word);
+		}
+		public void Shift()
+		{
+			byte[] word = GetWord();
+
+			int counter = 0;
+			byte carry = 0;
+			while (counter < word.Length)
+			{
+				byte b = word[counter];
+				word[counter] = (byte)(((b << 1) & 0xFF) | carry);
+				carry = (b & 0x80) != 0 ? (byte)1 : (byte)0;
 				counter++;
 			}
 
@@ -167,23 +200,6 @@ namespace Mirage
 			while (counter < word.Length)
 			{
 				word[counter] = (byte)(word[counter] & argument[counter]);
-				counter++;
-			}
-
-			SetWord(word);
-		}
-		public void Add()
-		{
-			byte[] word = GetWord();
-			byte[] argument = GetArgument();
-
-			int counter = 0;
-			int carry = 0;
-			while (counter < word.Length)
-			{
-				int sum = word[counter] + argument[counter] + carry;
-				word[counter] = (byte)(sum & 0xFF);
-				carry = sum >> 8;
 				counter++;
 			}
 

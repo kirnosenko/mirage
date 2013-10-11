@@ -72,11 +72,11 @@ namespace Mirage.Cmd
 					case '_':
 						machine.Clear();
 						break;
-					case '^':
-						machine.Inc();
-						break;
 					case '+':
 						machine.Add();
+						break;
+					case '-':
+						machine.Dec();
 						break;
 					case '~':
 						machine.Not();

@@ -31,7 +31,7 @@ namespace Mirage.Cmd
 		[Test]
 		public void Can_deal_with_cycles()
 		{
-			i.Run("]^<<^{~^~]}^!");
+			i.Run("]~-~<<~-~{-]}~-~!");
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 1, 0, 0, 0, 0, 0 });
 		}
 		[Test]

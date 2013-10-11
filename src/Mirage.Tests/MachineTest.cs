@@ -155,44 +155,19 @@ namespace Mirage
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0, 2 });
 		}
 		[Test]
-		public void Should_increment_word()
-		{
-			m.IncHiPointer();
-			m.Inc();
-			m.Output(output);
-			
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 1 });
-
-			m.Inc();
-			m.Output(output);
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 2 });
-
-			m.IncHiPointer();
-			for (int i = 0; i < 256; i++)
-			{
-				m.Inc();
-			}
-			m.Output(output);
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 2, 1 });
-		}
-		[Test]
-		public void Can_make_decrement_from_increment()
+		public void Should_decrement_word()
 		{
 			m = new Machine(new byte[] { 0, 0, 1 });
 
 			m.IncHiPointer();
 			m.IncHiPointer();
 			m.IncHiPointer();
-			m.Not();
-			m.Inc();
-			m.Not();
+			m.Dec();
 			m.Output(output);
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 255, 255, 0 });
 
 			m.XchPointers();
-			m.Not();
-			m.Inc();
-			m.Not();
+			m.Dec();
 			m.Output(output);
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 255, 254, 255 });
 		}
@@ -212,21 +187,19 @@ namespace Mirage
 		public void Should_invert_the_word()
 		{
 			m.IncHiPointer();
-			m.Inc();
 			m.Not();
 			m.Output(output);
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 254 });
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0xFF });
 
 			m.IncHiPointer();
 			m.Not();
 			m.Output(output);
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 1, 255 });
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0, 0xFF });
 		}
 		[Test]
 		public void Should_do_logic_shift_of_the_word()
 		{
-			m.IncHiPointer();
-			m.Inc();
+			m.LoadData(new byte[] { 1 });
 			m.Shl();
 			m.Shl();
 			m.Shl();
@@ -303,13 +276,13 @@ namespace Mirage
 			m.Output(output);
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0xFF, 0xFF });
 
-			m.Inc();
+			m.Not();
+			m.Dec();
+			m.Not();
 			m.Output(output);
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0, 0 });
 
-			m.Not();
-			m.Inc();
-			m.Not();
+			m.Dec();
 			m.Output(output);
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0xFF, 0xFF });
 		}
