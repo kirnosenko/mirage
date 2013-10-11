@@ -78,9 +78,9 @@ namespace Mirage.Cmd
 		[Test]
 		public void Should_run_rot13_program()
 		{
-			input.Add(Encoding.UTF8.GetBytes("HELLO"));
+			input.Add(Encoding.UTF8.GetBytes("HELLO world! 123 [] {}"));
 			RunFromFile("../../../../doc/Samples/ROT13.txt");
-			output.GetAndClear.Should().Have.SameSequenceAs(Encoding.UTF8.GetBytes("URYYB\0"));
+			output.GetAndClear.Should().Have.SameSequenceAs(Encoding.UTF8.GetBytes("URYYB jbeyq! 123 [] {}\0"));
 		}
 		
 		private void RunFromFile(string fileName)
