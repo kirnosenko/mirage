@@ -176,19 +176,23 @@ namespace Mirage
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 2, 1 });
 		}
 		[Test]
-		public void Should_decrement_word()
+		public void Can_make_decrement_from_increment()
 		{
 			m = new Machine(new byte[] { 0, 0, 1 });
 
 			m.IncHiPointer();
 			m.IncHiPointer();
 			m.IncHiPointer();
-			m.Dec();
+			m.Not();
+			m.Inc();
+			m.Not();
 			m.Output(output);
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 255, 255, 0 });
 
 			m.XchPointers();
-			m.Dec();
+			m.Not();
+			m.Inc();
+			m.Not();
 			m.Output(output);
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 255, 254, 255 });
 		}
@@ -274,32 +278,6 @@ namespace Mirage
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x3F, 0xFB });
 		}
 		[Test]
-		public void Should_do_logic_xor()
-		{
-			m = new Machine(new byte[] { 0x0F, 0x7A, 0x38, 0xF1 });
-
-			m.IncHiPointer();
-			m.IncHiPointer();
-			m.DragLoPointer();
-			m.IncHiPointer();
-			m.IncHiPointer();
-			m.Xor();
-			m.Output(output);
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x37, 0x8B });
-
-			m.Xor();
-			m.ReflectHiPointer();
-			m.Xor();
-			m.ReflectHiPointer();
-			m.Xor();
-			m.Output(output);
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x0F, 0x7A });
-			
-			m.ReflectHiPointer();
-			m.Output(output);
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x8B, 0x37 });
-		}
-		[Test]
 		public void Should_add_operand_to_word()
 		{
 			m = new Machine(new byte[] { 200, 20, 200, 40 });
@@ -360,7 +338,9 @@ namespace Mirage
 			m.Output(output);
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0, 0 });
 
-			m.Dec();
+			m.Not();
+			m.Inc();
+			m.Not();
 			m.Output(output);
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0xFF, 0xFF });
 		}

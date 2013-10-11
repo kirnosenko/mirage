@@ -42,8 +42,15 @@ namespace Mirage.Cmd
 			{
 				char opcode = src[pc++];
 
+				// `~!@#$%^&*()-_=+\|[{}];:'"<,.>/?
 				switch (opcode)
 				{
+					case ')':
+						machine.IncPointers();
+						break;
+					case '(':
+						machine.DecPointers();
+						break;
 					case ']':
 						machine.IncHiPointer();
 						break;
@@ -62,11 +69,8 @@ namespace Mirage.Cmd
 					case '%':
 						machine.XchPointers();
 						break;
-					case ')':
+					case '^':
 						machine.Inc();
-						break;
-					case '(':
-						machine.Dec();
 						break;
 					case '_':
 						machine.Clear();
@@ -85,9 +89,6 @@ namespace Mirage.Cmd
 						break;
 					case '|':
 						machine.Or();
-						break;
-					case '^':
-						machine.Xor();
 						break;
 					case '+':
 						machine.Add();

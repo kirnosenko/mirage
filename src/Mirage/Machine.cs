@@ -30,6 +30,16 @@ namespace Mirage
 			pointerHi = 0;
 		}
 
+		public void IncPointers()
+		{
+			pointerHi++;
+			pointerLo++;
+		}
+		public void DecPointers()
+		{
+			pointerHi--;
+			pointerLo--;
+		}
 		public void IncHiPointer()
 		{
 			pointerHi++;
@@ -83,22 +93,6 @@ namespace Mirage
 				int sum = word[counter] + carry;
 				carry = sum >= 256 ? 1 : 0;
 				word[counter] = (byte)(sum & 0xFF);
-				counter++;
-			}
-
-			SetWord(word);
-		}
-		public void Dec()
-		{
-			byte[] word = GetWord();
-
-			int counter = 0;
-			int carry = 1;
-			while (carry > 0 && counter < word.Length)
-			{
-				int sum = word[counter] - carry;
-				carry = sum < 0 ? 1 : 0;
-				word[counter] = sum < 0 ? (byte)0xFF : (byte)(sum & 0xFF);
 				counter++;
 			}
 
@@ -187,20 +181,6 @@ namespace Mirage
 			while (counter < word.Length)
 			{
 				word[counter] = (byte)(word[counter] | argument[counter]);
-				counter++;
-			}
-
-			SetWord(word);
-		}
-		public void Xor()
-		{
-			byte[] word = GetWord();
-			byte[] argument = GetArgument();
-
-			int counter = 0;
-			while (counter < word.Length)
-			{
-				word[counter] = (byte)(word[counter] ^ argument[counter]);
 				counter++;
 			}
 
