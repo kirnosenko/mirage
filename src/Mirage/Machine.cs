@@ -172,20 +172,6 @@ namespace Mirage
 
 			SetWord(word);
 		}
-		public void Or()
-		{
-			byte[] word = GetWord();
-			byte[] argument = GetArgument();
-
-			int counter = 0;
-			while (counter < word.Length)
-			{
-				word[counter] = (byte)(word[counter] | argument[counter]);
-				counter++;
-			}
-
-			SetWord(word);
-		}
 		public void Add()
 		{
 			byte[] word = GetWord();

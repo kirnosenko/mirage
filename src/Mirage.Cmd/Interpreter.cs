@@ -69,29 +69,26 @@ namespace Mirage.Cmd
 					case '%':
 						machine.XchPointers();
 						break;
-					case '^':
-						machine.Inc();
-						break;
 					case '_':
 						machine.Clear();
 						break;
+					case '^':
+						machine.Inc();
+						break;
+					case '+':
+						machine.Add();
+						break;
 					case '~':
 						machine.Not();
+						break;
+					case '&':
+						machine.And();
 						break;
 					case '>':
 						machine.Shr();
 						break;
 					case '<':
 						machine.Shl();
-						break;
-					case '&':
-						machine.And();
-						break;
-					case '|':
-						machine.Or();
-						break;
-					case '+':
-						machine.Add();
 						break;
 					case '!':
 						machine.Output(output);
