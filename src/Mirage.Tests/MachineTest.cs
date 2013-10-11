@@ -197,30 +197,6 @@ namespace Mirage
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0, 0xFF });
 		}
 		[Test]
-		public void Should_do_logic_shift_of_the_word()
-		{
-			m.LoadData(new byte[] { 0x8F });
-			m.Shift();
-			m.Shift();
-			m.Shift();
-			m.Output(output);
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x78 });
-
-			m.IncHiPointer();
-			m.Shift();
-			m.Shift();
-			m.Shift();
-			m.Shift();
-			m.Output(output);
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x80, 0x07 });
-
-			m.XchPointers();
-			m.Shift();
-			m.Shift();
-			m.Output(output);
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x01, 0x20 });
-		}
-		[Test]
 		public void Should_do_logic_and()
 		{
 			m = new Machine(new byte[] { 0x0F, 0x7A, 0x38, 0xF2 });

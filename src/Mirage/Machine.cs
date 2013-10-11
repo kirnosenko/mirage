@@ -17,6 +17,10 @@ namespace Mirage
 		public Machine(int memorySize)
 		{
 			memory = new byte[memorySize];
+			for (int i = 0; i < memorySize; i++)
+			{
+				memory[i] = 0;
+			}
 			Reset();
 		}
 		public Machine(byte[] memory)
@@ -151,49 +155,6 @@ namespace Mirage
 			while (counter < word.Length)
 			{
 				word[counter] = (byte)(word[counter] & argument[counter]);
-				counter++;
-			}
-
-			SetWord(word);
-		}
-		public void Shift()
-		{
-			if (pointerHi > pointerLo)
-			{
-				Shl();
-			}
-			else
-			{
-				Shr();
-			}
-		}
-		public void Shr()
-		{
-			byte[] word = GetWord();
-
-			int counter = word.Length - 1;
-			byte carry = 0;
-			while (counter >= 0)
-			{
-				byte b = word[counter];
-				word[counter] = (byte)(((b >> 1) & 0xFF) | carry);
-				carry = (b & 0x01) != 0 ? (byte)128 : (byte)0;
-				counter--;
-			}
-
-			SetWord(word);
-		}
-		public void Shl()
-		{
-			byte[] word = GetWord();
-
-			int counter = 0;
-			byte carry = 0;
-			while (counter < word.Length)
-			{
-				byte b = word[counter];
-				word[counter] = (byte)(((b << 1) & 0xFF) | carry);
-				carry = (b & 0x80) != 0 ? (byte)1 : (byte)0;
 				counter++;
 			}
 

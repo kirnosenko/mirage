@@ -83,9 +83,6 @@ namespace Mirage.Cmd
 					case '&':
 						machine.And();
 						break;
-					case '^':
-						machine.Shift();
-						break;
 					case '!':
 						machine.Output(output);
 						break;
