@@ -5,13 +5,14 @@ namespace Mirage
 {
 	public class AsciiConsoleInput
 	{
-		private Queue<byte> buffer;
+		private Queue<byte> buffer = new Queue<byte>(255);
 		
-		public AsciiConsoleInput()
+		public static implicit operator Action<byte[]>(AsciiConsoleInput input)
 		{
-			buffer = new Queue<byte>(255);
+			return input.Input;
 		}
-		public void Input(byte[] data)
+
+		protected void Input(byte[] data)
 		{
 			if (buffer.Count < data.Length)
 			{

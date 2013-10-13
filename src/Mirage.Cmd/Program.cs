@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading;
 
 namespace Mirage.Cmd
 {
@@ -11,7 +12,7 @@ namespace Mirage.Cmd
 		{
 			Console.Title = "Mirage interactive interpreter 0.9.0 alpha";
 
-			Interpreter interpreter = new Interpreter(64 * 1024);
+			Interpreter interpreter = new Interpreter(64 * 1024, new AsciiConsoleInput(), new AsciiConsoleOutput());
 			Stopwatch time = null;
 			string src;
 			

@@ -8,32 +8,12 @@ namespace Mirage.Cmd
 		private Machine machine;
 		private Action<byte[]> input;
 		private Action<byte[]> output;
-		
-		public Interpreter(int memorySize)
-			: this(memorySize, null, null)
-		{
-		}
+
 		public Interpreter(int memorySize, Action<byte[]> input, Action<byte[]> output)
 		{
-			machine = new Machine(memorySize);
-			if (input != null)
-			{
-				this.input = input;
-			}
-			else
-			{
-				AsciiConsoleInput consoleInput = new AsciiConsoleInput();
-				this.input = consoleInput.Input;
-			}
-			if (output != null)
-			{
-				this.output = output;
-			}
-			else
-			{
-				AsciiConsoleOutput consoleOutput = new AsciiConsoleOutput();
-				this.output = consoleOutput.Output;
-			}
+			this.machine = new Machine(memorySize);
+			this.input = input;
+			this.output = output;
 		}
 		public void Run(string src)
 		{
@@ -83,11 +63,20 @@ namespace Mirage.Cmd
 					case '&':
 						machine.And();
 						break;
-					case '!':
-						machine.Output(output);
+					case '"':
+						int start = pc;
+						int end = start;
+						while (src[pc++] != '"')
+						{
+							end = pc;
+						}
+						machine.LoadData(ParseString(src.Substring(start, end - start)));
 						break;
 					case '?':
 						machine.Input(input);
+						break;
+					case '!':
+						machine.Output(output);
 						break;
 					case '{':
 						if (machine.Jmp())
@@ -128,15 +117,6 @@ namespace Mirage.Cmd
 									break;
 							}
 						}
-						break;
-					case '"':
-						int start = pc;
-						int end = start;
-						while (src[pc++] != '"')
-						{
-							end = pc;
-						}
-						machine.LoadData(ParseString(src.Substring(start, end - start)));
 						break;
 					default:
 						break;

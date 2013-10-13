@@ -161,13 +161,13 @@ namespace Mirage
 			SetWord(word);
 		}
 
-		public void Output(Action<byte[]> output)
+		public void LoadData(byte[] word)
 		{
-			if (output != null)
-			{
-				byte[] word = GetWord();
-				output(word);
-			}
+			int sizeDelta = word.Length - Math.Abs(pointerHi - pointerLo);
+
+			pointerHi += pointerHi >= pointerLo ? sizeDelta : -sizeDelta;
+
+			SetWord(word);
 		}
 		public void Input(Action<byte[]> input)
 		{
@@ -178,13 +178,25 @@ namespace Mirage
 				SetWord(word);
 			}
 		}
-		public void LoadData(byte[] word)
+		public void Output(Action<byte[]> output)
 		{
-			int sizeDelta = word.Length - Math.Abs(pointerHi - pointerLo);
+			if (output != null)
+			{
+				byte[] word = GetWord();
+				output(word);
+			}
+		}
+		public void Beep(Action<int,int> beep)
+		{
+			if (pointerHi == pointerLo)
+			{
+				return;
+			}
 
-			pointerHi += pointerHi >= pointerLo ? sizeDelta : -sizeDelta;
+			byte[] word = GetWord();
+			byte[] argument = GetArgument();
 
-			SetWord(word);
+
 		}
 
 		public bool Jmp()

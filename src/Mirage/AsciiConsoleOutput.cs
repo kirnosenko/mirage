@@ -4,7 +4,12 @@ namespace Mirage
 {
 	public class AsciiConsoleOutput
 	{
-		public void Output(byte[] data)
+		public static implicit operator Action<byte[]>(AsciiConsoleOutput output)
+		{
+			return output.Output;
+		}
+
+		protected void Output(byte[] data)
 		{
 			foreach (var b in data)
 			{
