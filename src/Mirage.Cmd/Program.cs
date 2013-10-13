@@ -12,7 +12,7 @@ namespace Mirage.Cmd
 		{
 			Console.Title = "Mirage interactive interpreter 0.9.0 alpha";
 
-			Interpreter interpreter = new Interpreter(64 * 1024, new AsciiConsoleInput(), new AsciiConsoleOutput());
+			Interpreter interpreter = new Interpreter(64 * 1024, new ConsoleInput(), new ConsoleOutput());
 			Stopwatch time = null;
 			string src;
 			

@@ -148,13 +148,25 @@ namespace Mirage
 		}
 		public void And()
 		{
+			Logic((op1, op2) => (byte)(op1 & op2));
+		}
+		public void Or()
+		{
+			Logic((op1, op2) => (byte)(op1 | op2));
+		}
+		public void Xor()
+		{
+			Logic((op1, op2) => (byte)(op1 ^ op2));
+		}
+		public void Logic(Func<byte,byte,byte> func)
+		{
 			byte[] word = GetWord();
 			byte[] argument = GetArgument();
 
 			int counter = 0;
 			while (counter < word.Length)
 			{
-				word[counter] = (byte)(word[counter] & argument[counter]);
+				word[counter] = func(word[counter], argument[counter]);
 				counter++;
 			}
 
@@ -185,18 +197,6 @@ namespace Mirage
 				byte[] word = GetWord();
 				output(word);
 			}
-		}
-		public void Beep(Action<int,int> beep)
-		{
-			if (pointerHi == pointerLo)
-			{
-				return;
-			}
-
-			byte[] word = GetWord();
-			byte[] argument = GetArgument();
-
-
 		}
 
 		public bool Jmp()

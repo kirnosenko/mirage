@@ -63,6 +63,12 @@ namespace Mirage.Cmd
 					case '&':
 						machine.And();
 						break;
+					case '|':
+						machine.Or();
+						break;
+					case '^':
+						machine.Xor();
+						break;
 					case '"':
 						int start = pc;
 						int end = start;
