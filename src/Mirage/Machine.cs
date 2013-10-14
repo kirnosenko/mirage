@@ -36,44 +36,46 @@ namespace Mirage
 
 		public void IncPointers()
 		{
-			pointerHi++;
-			pointerLo++;
+			PointerLo++;
+			PointerHi++;
 		}
 		public void DecPointers()
 		{
-			pointerHi--;
-			pointerLo--;
+			PointerLo--;
+			PointerHi--;
 		}
 		public void IncHiPointer()
 		{
-			pointerHi++;
+			PointerHi++;
 		}
 		public void DecHiPointer()
 		{
-			pointerHi--;
+			PointerHi--;
 		}
 		public void ReflectHiPointer()
 		{
-			pointerHi = pointerLo - (pointerHi - pointerLo);
+			PointerHi = PointerLo - (PointerHi - PointerLo);
 		}
 		public void LoadHiPointer()
 		{
-			if (pointerHi == pointerLo)
+			if (PointerHi == PointerLo)
 			{
 				pointerHi = 0;
 				return;
 			}
 
 			byte[] word = GetWord();
-			pointerHi = 0;
+			int newHiPointer = 0;
 			
 			int counter = word.Length-1;
 			while (counter >= 0)
 			{
-				pointerHi = pointerHi << 8;
-				pointerHi |= word[counter];
+				newHiPointer = newHiPointer << 8;
+				newHiPointer |= word[counter];
 				counter--;
 			}
+
+			PointerHi = newHiPointer;
 		}
 		public void DragLoPointer()
 		{
@@ -175,9 +177,9 @@ namespace Mirage
 
 		public void LoadData(byte[] word)
 		{
-			int sizeDelta = word.Length - Math.Abs(pointerHi - pointerLo);
+			int sizeDelta = word.Length - Math.Abs(PointerHi - PointerLo);
 
-			pointerHi += pointerHi >= pointerLo ? sizeDelta : -sizeDelta;
+			PointerHi += PointerHi >= PointerLo ? sizeDelta : -sizeDelta;
 
 			SetWord(word);
 		}
@@ -185,7 +187,7 @@ namespace Mirage
 		{
 			if (input != null)
 			{
-				byte[] word = new byte[Math.Abs(pointerHi - pointerLo)];
+				byte[] word = new byte[Math.Abs(PointerHi - PointerLo)];
 				input(word);
 				SetWord(word);
 			}
@@ -201,59 +203,53 @@ namespace Mirage
 
 		public bool Jmp()
 		{
-			return ((pointerHi == pointerLo) || WordIsZero());
+			return ((PointerHi == PointerLo) || WordIsZero());
 		}
-		
-		protected byte[] GetWord()
+
+		protected int PointerLo
 		{
-			if (pointerHi == pointerLo)
+			get
 			{
-				return new byte[] {};
+				return pointerLo;
 			}
-			int pointerDelta = pointerHi > pointerLo ? 1 : -1;
-			int startPointer = pointerLo;
-			int endPoiner = pointerHi;
-			if (pointerDelta < 0)
+			set
 			{
-				startPointer -= 1;
-				endPoiner -= 1;
+				pointerLo = value;
+				if (pointerLo < 0)
+				{
+					pointerLo = 0;
+				}
+				else if (pointerLo > memory.Length)
+				{
+					pointerLo = memory.Length;
+				}
 			}
-
-			byte[] word = new byte[Math.Abs(pointerHi - pointerLo)];
-			int pointer = startPointer;
-			int counter = 0;
-			do
-			{
-				word[counter] = memory[pointer];
-				pointer += pointerDelta;
-				counter++;
-			} while (pointer != endPoiner);
-
-			return word;
 		}
-		protected void SetWord(byte[] word)
+		protected int PointerHi
 		{
-			if ((pointerHi == pointerLo) || (word.Length == 0))
+			get
 			{
-				return;
+				return pointerHi;
 			}
-			int pointerDelta = pointerHi > pointerLo ? 1 : -1;
-			int startPointer = pointerLo;
-			int endPoiner = pointerHi;
-			if (pointerDelta < 0)
+			set
 			{
-				startPointer -= 1;
-				endPoiner -= 1;
+				pointerHi = value;
+				if (pointerHi < 0)
+				{
+					pointerHi = 0;
+				}
+				else if (pointerHi > memory.Length)
+				{
+					pointerHi = memory.Length;
+				}
 			}
-
-			int pointer = startPointer;
-			int counter = 0;
-			while ((pointer != endPoiner) && (counter < word.Length))
+		}
+		protected int WordSize
+		{
+			get
 			{
-				memory[pointer] = word[counter];
-				pointer += pointerDelta;
-				counter++;
-			} 
+				return Math.Abs(PointerHi - PointerLo);
+			}
 		}
 		protected bool WordIsZero()
 		{
@@ -269,29 +265,81 @@ namespace Mirage
 
 			return true;
 		}
-		protected byte[] GetArgument()
+
+		protected byte[] GetWord()
 		{
-			if (pointerHi == pointerLo)
+			if (PointerHi == PointerLo)
 			{
 				return new byte[] {};
 			}
-			int pointerDelta = pointerHi > pointerLo ? 1 : -1;
-			int startPointer = pointerLo;
-			int endPoiner = pointerHi;
+			int pointerDelta = PointerHi > PointerLo ? 1 : -1;
+			int startPointer = PointerLo;
+			int endPoiner = PointerHi;
 			if (pointerDelta < 0)
 			{
 				startPointer -= 1;
 				endPoiner -= 1;
-				startPointer += Math.Abs(pointerHi - pointerLo);
-				endPoiner += Math.Abs(pointerHi - pointerLo);
+			}
+
+			byte[] word = new byte[Math.Abs(PointerHi - PointerLo)];
+			int pointer = startPointer;
+			int counter = 0;
+			do
+			{
+				word[counter] = memory[pointer];
+				pointer += pointerDelta;
+				counter++;
+			} while (pointer != endPoiner);
+
+			return word;
+		}
+		protected void SetWord(byte[] word)
+		{
+			if ((PointerHi == PointerLo) || (word.Length == 0))
+			{
+				return;
+			}
+			int pointerDelta = PointerHi > PointerLo ? 1 : -1;
+			int startPointer = PointerLo;
+			int endPoiner = PointerHi;
+			if (pointerDelta < 0)
+			{
+				startPointer -= 1;
+				endPoiner -= 1;
+			}
+
+			int pointer = startPointer;
+			int counter = 0;
+			while ((pointer != endPoiner) && (counter < word.Length))
+			{
+				memory[pointer] = word[counter];
+				pointer += pointerDelta;
+				counter++;
+			} 
+		}
+		protected byte[] GetArgument()
+		{
+			if (PointerHi == PointerLo)
+			{
+				return new byte[] {};
+			}
+			int pointerDelta = PointerHi > PointerLo ? 1 : -1;
+			int startPointer = PointerLo;
+			int endPoiner = PointerHi;
+			if (pointerDelta < 0)
+			{
+				startPointer -= 1;
+				endPoiner -= 1;
+				startPointer += Math.Abs(PointerHi - PointerLo);
+				endPoiner += Math.Abs(PointerHi - PointerLo);
 			}
 			else
 			{
-				startPointer -= Math.Abs(pointerHi - pointerLo);
-				endPoiner -= Math.Abs(pointerHi - pointerLo);
+				startPointer -= Math.Abs(PointerHi - PointerLo);
+				endPoiner -= Math.Abs(PointerHi - PointerLo);
 			}
 
-			byte[] argument = new byte[Math.Abs(pointerHi - pointerLo)];
+			byte[] argument = new byte[Math.Abs(PointerHi - PointerLo)];
 			int pointer = startPointer;
 			int counter = 0;
 			do

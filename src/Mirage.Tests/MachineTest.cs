@@ -27,6 +27,41 @@ namespace Mirage
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] {});
 		}
 		[Test]
+		public void Should_not_move_pointers_outside_memory_space()
+		{
+			m = new Machine(new byte[] { 1, 2, 3, 4, 5 });
+
+			m.IncHiPointer();
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 1 });
+			m.DecPointers();
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] {});
+			m.IncHiPointer();
+			m.IncPointers();
+			m.IncPointers();
+			m.IncPointers();
+			m.IncPointers();
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 5 });
+			m.IncPointers();
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] {});
+			m.IncPointers();
+			m.DecHiPointer();
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 5 });
+			m.ReflectHiPointer();
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] {});
+			m.Reset();
+			m.IncHiPointer();
+			m.IncHiPointer();
+			m.LoadHiPointer();
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 1, 2, 3, 4, 5 });
+		}
+		[Test]
 		public void Output_size_is_equel_to_word_size()
 		{
 			m.Output(output);
