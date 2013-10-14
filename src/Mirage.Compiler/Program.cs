@@ -1,21 +1,21 @@
 ﻿using System;
-using System.IO;
 
-namespace Mirage.Cil
+namespace Mirage.Compiler
 {
 	class Program
 	{
 		static void Main(string[] args)
 		{
-			Console.Title = "Mirage CIL compiler 0.9.0 alpha";
+			Console.Title = "Mirage CIL compiler 1.0.0 alpha";
 
-			string srcFilename = "";
+			/*
+			string srcFilename = args[0];
 			string assemblyFilename = "";
 			string src = "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.";
-
-			Compiler c = new Compiler();
-			c.CheckSyntax(src);
-			c.Compile("test", src);
+			*/
+			CilCompiler c = new CilCompiler();
+			//c.CheckSyntax(src);
+			c.Compile("hello");
 		}
 	}
 }

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Mirage.Cil")]
+[assembly: AssemblyTitle("Mirage.Compiler")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Mirage.Cil")]
+[assembly: AssemblyProduct("Mirage.Compiler")]
 [assembly: AssemblyCopyright("Copyright ©  2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("cc1903e3-d663-4867-a90c-3214ddf2772c")]
+[assembly: Guid("42c16d59-a084-423f-b2de-75ba324c3da6")]
 
 // Version information for an assembly consists of the following four values:
 //
