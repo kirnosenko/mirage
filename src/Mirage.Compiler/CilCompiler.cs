@@ -148,6 +148,8 @@ namespace Mirage.Compiler
 				var opAnd = TypeHelper.GetMethod(machineType, nameTable.GetNameFor("And"));
 				var opOr = TypeHelper.GetMethod(machineType, nameTable.GetNameFor("Or"));
 				var opXor = TypeHelper.GetMethod(machineType, nameTable.GetNameFor("Xor"));
+				var opSal = TypeHelper.GetMethod(machineType, nameTable.GetNameFor("Sal"));
+				var opSar = TypeHelper.GetMethod(machineType, nameTable.GetNameFor("Sar"));
 
 				var opLoadData = TypeHelper.GetMethod(machineType, nameTable.GetNameFor("LoadData"), host.PlatformType.SystemString);
 				var opInput = TypeHelper.GetMethod(machineType, nameTable.GetNameFor("Input"), inputCast.Type);
@@ -233,6 +235,14 @@ namespace Mirage.Compiler
 						case '^':
 							ilGenerator.Emit(OperationCode.Ldloc_0);
 							ilGenerator.Emit(OperationCode.Callvirt, opXor);
+							break;
+						case '*':
+							ilGenerator.Emit(OperationCode.Ldloc_0);
+							ilGenerator.Emit(OperationCode.Callvirt, opSal);
+							break;
+						case '/':
+							ilGenerator.Emit(OperationCode.Ldloc_0);
+							ilGenerator.Emit(OperationCode.Callvirt, opSar);
 							break;
 						case '(':
 							int dataStart = pc;

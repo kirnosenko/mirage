@@ -175,6 +175,38 @@ namespace Mirage
 
 			SetWord(word);
 		}
+		public void Sal()
+		{
+			byte[] word = GetWord();
+
+			int counter = 0;
+			byte carry = 0;
+			while (counter < word.Length)
+			{
+				byte b = word[counter];
+				word[counter] = (byte)(((b << 1) & 0xFF) | carry);
+				carry = (b & 0x80) != 0 ? (byte)1 : (byte)0;
+				counter++;
+			}
+
+			SetWord(word);
+		}
+		public void Sar()
+		{
+			byte[] word = GetWord();
+
+			int counter = word.Length - 1;
+			byte carry = (byte)(word[counter] & 0x80);
+			while (counter >= 0)
+			{
+				byte b = word[counter];
+				word[counter] = (byte)(((b >> 1) & 0xFF) | carry);
+				carry = (b & 0x01) != 0 ? (byte)128 : (byte)0;
+				counter--;
+			}
+
+			SetWord(word);
+		}
 
 		public void LoadData(string str)
 		{

@@ -69,6 +69,12 @@ namespace Mirage.Cmd
 					case '^':
 						machine.Xor();
 						break;
+					case '*':
+						machine.Sal();
+						break;
+					case '/':
+						machine.Sar();
+						break;
 					case '(':
 						int dataStart = pc;
 						int dataEnd = dataStart;

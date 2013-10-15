@@ -318,6 +318,29 @@ namespace Mirage
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x8B, 0x37 });
 		}
 		[Test]
+		public void Should_do_arithmetic_shift_of_the_word()
+		{
+			m.LoadData("0x01");
+			m.Sal();
+			m.Sal();
+			m.Sal();
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 8 });
+
+			m.IncHiPointer();
+			for (int i = 0; i < 12; i++)
+			{
+				m.Sal();
+			}
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0, 128 });
+
+			m.Sar();
+			m.Sar();
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0, 224 });
+		}
+		[Test]
 		public void Should_add_operand_to_word()
 		{
 			m = new Machine(new byte[] { 200, 20, 200, 40 });
