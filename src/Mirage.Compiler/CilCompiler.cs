@@ -234,10 +234,10 @@ namespace Mirage.Compiler
 							ilGenerator.Emit(OperationCode.Ldloc_0);
 							ilGenerator.Emit(OperationCode.Callvirt, opXor);
 							break;
-						case '"':
+						case '(':
 							int dataStart = pc;
 							int dataEnd = dataStart;
-							while (src[pc++] != '"')
+							while (src[pc++] != ')')
 							{
 								dataEnd = pc;
 							}
@@ -291,6 +291,7 @@ namespace Mirage.Compiler
 						new LocalDefinition() { Type = machineType },
 						new LocalDefinition() { Type = inputType },
 						new LocalDefinition() { Type = outputType },
+						new LocalDefinition() { Type = host.PlatformType.SystemInt32 },
 					},
 					Enumerable<ITypeDefinition>.Empty
 				);

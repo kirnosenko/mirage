@@ -135,6 +135,22 @@ namespace Mirage
 			m.LoadData("0xa5f");
 			m.Output(output);
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x5F, 0x0A });
+
+			m.LoadData("0x0AFF");
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0xFF, 0x0A });
+
+			m.LoadData("0xaff");
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0xFF, 0x0A });
+
+			m.LoadData("0x000f");
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x0F, 0x00 });
+
+			m.LoadData("");
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] {});
 		}
 		[Test]
 		public void Word_is_byte_sequence_from_lo_pointer_to_hi_one()

@@ -69,10 +69,10 @@ namespace Mirage.Cmd
 					case '^':
 						machine.Xor();
 						break;
-					case '"':
+					case '(':
 						int dataStart = pc;
 						int dataEnd = dataStart;
-						while (src[pc++] != '"')
+						while (src[pc++] != ')')
 						{
 							dataEnd = pc;
 						}

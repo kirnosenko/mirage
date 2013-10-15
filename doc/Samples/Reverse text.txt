@@ -1,1 +1,1 @@
-﻿"text to reverse"%!
+﻿(text to reverse)%!
