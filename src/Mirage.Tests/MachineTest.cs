@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using NUnit.Framework;
 using SharpTestsEx;
 
@@ -103,22 +104,37 @@ namespace Mirage
 		[Test]
 		public void Should_set_word_size_equal_to_loaded_data_size()
 		{
-			m.LoadData(new byte[] { 1, 2 });
+			m.LoadData("01");
 			m.Output(output);
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 1, 2 });
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { (byte)'0', (byte)'1' });
 
-			m.LoadData(new byte[] { 3 });
+			m.LoadData("3");
 			m.Output(output);
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 3 });
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { (byte)'3' });
 
-			m.LoadData(new byte[] { 5, 5, 5 });
+			m.LoadData("555");
 			m.Output(output);
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 5, 5, 5 });
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { (byte)'5', (byte)'5', (byte)'5' });
 
 			m.XchPointers();
-			m.LoadData(new byte[] { 8, 9 });
+			m.LoadData("89");
 			m.Output(output);
-			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 8, 9 });
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { (byte)'8', (byte)'9' });
+		}
+		[Test]
+		public void Should_parse_loaded_data_format()
+		{
+			m.LoadData("some text");
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(Encoding.UTF8.GetBytes("some text"));
+
+			m.LoadData("0x0F");
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x0F });
+
+			m.LoadData("0xa5f");
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x5F, 0x0A });
 		}
 		[Test]
 		public void Word_is_byte_sequence_from_lo_pointer_to_hi_one()

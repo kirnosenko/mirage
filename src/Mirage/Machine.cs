@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace Mirage
 {
@@ -175,13 +176,38 @@ namespace Mirage
 			SetWord(word);
 		}
 
-		public void LoadData(byte[] word)
+		public void LoadData(string str)
 		{
-			int sizeDelta = word.Length - Math.Abs(PointerHi - PointerLo);
+			byte[] data = null;
 
-			PointerHi += PointerHi >= PointerLo ? sizeDelta : -sizeDelta;
+			if (str == String.Empty)
+			{
+				data = new byte[] {};
+			}
+			else
+			{
+				if (str.StartsWith("0x"))
+				{
+					string hexStr = str.Substring(2, str.Length - 2).ToUpper();
 
-			SetWord(word);
+					data = new byte[(hexStr.Length + 1) / 2];
+					for (int i = 0; i < data.Length; i++)
+					{
+						int hexStrPos = hexStr.Length - 1 - i * 2;
+						data[i] = (byte)HexToInt(hexStr[hexStrPos]);
+						if (hexStrPos > 0)
+						{
+							data[i] += (byte)(HexToInt(hexStr[hexStrPos - 1]) * 16);
+						}
+					}
+				}
+				else
+				{
+					data = Encoding.UTF8.GetBytes(str);
+				}
+			}
+
+			LoadData(data);
 		}
 		public void Input(Action<byte[]> input)
 		{
@@ -264,6 +290,28 @@ namespace Mirage
 			}
 
 			return true;
+		}
+
+		protected void LoadData(byte[] word)
+		{
+			int sizeDelta = word.Length - Math.Abs(PointerHi - PointerLo);
+
+			PointerHi += PointerHi >= PointerLo ? sizeDelta : -sizeDelta;
+
+			SetWord(word);
+		}
+		protected int HexToInt(char letter)
+		{
+			int code = (int)letter;
+			if ((code > 47) && (code < 58)) // 0..9
+			{
+				return code - 48;
+			}
+			if ((code > 64) && (code < 71)) // A..F
+			{
+				return code - 55;
+			}
+			return 0;
 		}
 
 		protected byte[] GetWord()

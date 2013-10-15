@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Microsoft.Cci;
 using Microsoft.Cci.MutableCodeModel;
 
@@ -148,6 +149,7 @@ namespace Mirage.Compiler
 				var opOr = TypeHelper.GetMethod(machineType, nameTable.GetNameFor("Or"));
 				var opXor = TypeHelper.GetMethod(machineType, nameTable.GetNameFor("Xor"));
 
+				var opLoadData = TypeHelper.GetMethod(machineType, nameTable.GetNameFor("LoadData"), host.PlatformType.SystemString);
 				var opInput = TypeHelper.GetMethod(machineType, nameTable.GetNameFor("Input"), inputCast.Type);
 				var opOutput = TypeHelper.GetMethod(machineType, nameTable.GetNameFor("Output"), outputCast.Type);
 
@@ -172,13 +174,76 @@ namespace Mirage.Compiler
 
 					switch (opcode)
 					{
+						case '>':
+							ilGenerator.Emit(OperationCode.Ldloc_0);
+							ilGenerator.Emit(OperationCode.Callvirt, opIncPointers);
+							break;
+						case '<':
+							ilGenerator.Emit(OperationCode.Ldloc_0);
+							ilGenerator.Emit(OperationCode.Callvirt, opDecPointers);
+							break;
 						case ']':
 							ilGenerator.Emit(OperationCode.Ldloc_0);
 							ilGenerator.Emit(OperationCode.Callvirt, opIncHiPointer);
 							break;
+						case '[':
+							ilGenerator.Emit(OperationCode.Ldloc_0);
+							ilGenerator.Emit(OperationCode.Callvirt, opDecHiPointer);
+							break;
+						case '#':
+							ilGenerator.Emit(OperationCode.Ldloc_0);
+							ilGenerator.Emit(OperationCode.Callvirt, opReflectHiPointer);
+							break;
+						case '$':
+							ilGenerator.Emit(OperationCode.Ldloc_0);
+							ilGenerator.Emit(OperationCode.Callvirt, opLoadHiPointer);
+							break;
+						case '=':
+							ilGenerator.Emit(OperationCode.Ldloc_0);
+							ilGenerator.Emit(OperationCode.Callvirt, opDragLoPointer);
+							break;
+						case '%':
+							ilGenerator.Emit(OperationCode.Ldloc_0);
+							ilGenerator.Emit(OperationCode.Callvirt, opXchPointers);
+							break;
+						case '_':
+							ilGenerator.Emit(OperationCode.Ldloc_0);
+							ilGenerator.Emit(OperationCode.Callvirt, opClear);
+							break;
+						case '+':
+							ilGenerator.Emit(OperationCode.Ldloc_0);
+							ilGenerator.Emit(OperationCode.Callvirt, opAdd);
+							break;
+						case '-':
+							ilGenerator.Emit(OperationCode.Ldloc_0);
+							ilGenerator.Emit(OperationCode.Callvirt, opDec);
+							break;
 						case '~':
 							ilGenerator.Emit(OperationCode.Ldloc_0);
 							ilGenerator.Emit(OperationCode.Callvirt, opNot);
+							break;
+						case '&':
+							ilGenerator.Emit(OperationCode.Ldloc_0);
+							ilGenerator.Emit(OperationCode.Callvirt, opAnd);
+							break;
+						case '|':
+							ilGenerator.Emit(OperationCode.Ldloc_0);
+							ilGenerator.Emit(OperationCode.Callvirt, opOr);
+							break;
+						case '^':
+							ilGenerator.Emit(OperationCode.Ldloc_0);
+							ilGenerator.Emit(OperationCode.Callvirt, opXor);
+							break;
+						case '"':
+							int dataStart = pc;
+							int dataEnd = dataStart;
+							while (src[pc++] != '"')
+							{
+								dataEnd = pc;
+							}
+							ilGenerator.Emit(OperationCode.Ldloc_0);
+							ilGenerator.Emit(OperationCode.Ldstr, src.Substring(dataStart, dataEnd - dataStart));
+							ilGenerator.Emit(OperationCode.Callvirt, opLoadData);
 							break;
 						case '?':
 							ilGenerator.Emit(OperationCode.Ldloc_0);
@@ -193,12 +258,12 @@ namespace Mirage.Compiler
 							ilGenerator.Emit(OperationCode.Callvirt, opOutput);
 							break;
 						case '{':
-							var start = new ILGeneratorLabel();
-							var end = new ILGeneratorLabel();
-							labels.Push(start);
-							labels.Push(end);
-							ilGenerator.Emit(OperationCode.Br_S, end);
-							ilGenerator.MarkLabel(start);
+							var cycleStart = new ILGeneratorLabel();
+							var cycleEnd = new ILGeneratorLabel();
+							labels.Push(cycleStart);
+							labels.Push(cycleEnd);
+							ilGenerator.Emit(OperationCode.Br_S, cycleEnd);
+							ilGenerator.MarkLabel(cycleStart);
 							break;
 						case '}':
 							ilGenerator.MarkLabel(labels.Pop());
