@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace Mirage.Compiler
 {
@@ -7,15 +8,18 @@ namespace Mirage.Compiler
 		static void Main(string[] args)
 		{
 			Console.Title = "Mirage CIL compiler 1.0.0 alpha";
+			Console.WriteLine(Console.Title);
 
-			/*
-			string srcFilename = args[0];
-			string assemblyFilename = "";
-			string src = "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.";
-			*/
-			CilCompiler c = new CilCompiler();
-			//c.CheckSyntax(src);
-			c.Compile("hello");
+			if (args.Length > 0)
+			{
+				string fileName = args[0];
+
+				if (File.Exists(fileName))
+				{
+					CilCompiler c = new CilCompiler();
+					c.Compile(fileName);
+				}
+			}
 		}
 	}
 }
