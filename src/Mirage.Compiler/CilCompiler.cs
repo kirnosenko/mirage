@@ -262,7 +262,7 @@ namespace Mirage.Compiler
 							var cycleEnd = new ILGeneratorLabel();
 							labels.Push(cycleStart);
 							labels.Push(cycleEnd);
-							ilGenerator.Emit(OperationCode.Br_S, cycleEnd);
+							ilGenerator.Emit(OperationCode.Br, cycleEnd);
 							ilGenerator.MarkLabel(cycleStart);
 							break;
 						case '}':
@@ -273,7 +273,7 @@ namespace Mirage.Compiler
 							ilGenerator.Emit(OperationCode.Ceq);
 							ilGenerator.Emit(OperationCode.Stloc_3);
 							ilGenerator.Emit(OperationCode.Ldloc_3);
-							ilGenerator.Emit(OperationCode.Brtrue_S, labels.Pop());
+							ilGenerator.Emit(OperationCode.Brtrue, labels.Pop());
 							break;
 						default:
 							break;
