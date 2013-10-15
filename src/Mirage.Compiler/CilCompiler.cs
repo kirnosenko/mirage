@@ -151,7 +151,11 @@ namespace Mirage.Compiler
 				var opInput = TypeHelper.GetMethod(machineType, nameTable.GetNameFor("Input"), inputCast.Type);
 				var opOutput = TypeHelper.GetMethod(machineType, nameTable.GetNameFor("Output"), outputCast.Type);
 
+				var opJmp = TypeHelper.GetMethod(machineType, nameTable.GetNameFor("Jmp"));
+
 				// Create program code
+
+				var labels = new Stack<ILGeneratorLabel>(100);
 
 				var ilGenerator = new ILGenerator(host, mainMethod);
 				ilGenerator.Emit(OperationCode.Newobj, machineConstructor);
@@ -160,7 +164,7 @@ namespace Mirage.Compiler
 				ilGenerator.Emit(OperationCode.Stloc_1);
 				ilGenerator.Emit(OperationCode.Newobj, outputConstructor);
 				ilGenerator.Emit(OperationCode.Stloc_2);
-				
+
 				int pc = 0;
 				while (pc < src.Length)
 				{
@@ -188,6 +192,24 @@ namespace Mirage.Compiler
 							ilGenerator.Emit(OperationCode.Call, outputCast);
 							ilGenerator.Emit(OperationCode.Callvirt, opOutput);
 							break;
+						case '{':
+							var start = new ILGeneratorLabel();
+							var end = new ILGeneratorLabel();
+							labels.Push(start);
+							labels.Push(end);
+							ilGenerator.Emit(OperationCode.Br_S, end);
+							ilGenerator.MarkLabel(start);
+							break;
+						case '}':
+							ilGenerator.MarkLabel(labels.Pop());
+							ilGenerator.Emit(OperationCode.Ldloc_0);
+							ilGenerator.Emit(OperationCode.Callvirt, opJmp);
+							ilGenerator.Emit(OperationCode.Ldc_I4_0);
+							ilGenerator.Emit(OperationCode.Ceq);
+							ilGenerator.Emit(OperationCode.Stloc_3);
+							ilGenerator.Emit(OperationCode.Ldloc_3);
+							ilGenerator.Emit(OperationCode.Brtrue_S, labels.Pop());
+							break;
 						default:
 							break;
 					}
@@ -201,9 +223,9 @@ namespace Mirage.Compiler
 					8,
 					mainMethod,
 					new List<ILocalDefinition>() {
+						new LocalDefinition() { Type = machineType },
 						new LocalDefinition() { Type = inputType },
 						new LocalDefinition() { Type = outputType },
-						new LocalDefinition() { Type = machineType },
 					},
 					Enumerable<ITypeDefinition>.Empty
 				);
