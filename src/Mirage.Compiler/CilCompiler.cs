@@ -155,7 +155,7 @@ namespace Mirage.Compiler
 				var opInput = TypeHelper.GetMethod(machineType, nameTable.GetNameFor("Input"), inputCast.Type);
 				var opOutput = TypeHelper.GetMethod(machineType, nameTable.GetNameFor("Output"), outputCast.Type);
 
-				var opJmp = TypeHelper.GetMethod(machineType, nameTable.GetNameFor("Jmp"));
+				var opJz = TypeHelper.GetMethod(machineType, nameTable.GetNameFor("Jz"));
 
 				// Create program code
 
@@ -278,7 +278,7 @@ namespace Mirage.Compiler
 						case '}':
 							ilGenerator.MarkLabel(labels.Pop());
 							ilGenerator.Emit(OperationCode.Ldloc_0);
-							ilGenerator.Emit(OperationCode.Callvirt, opJmp);
+							ilGenerator.Emit(OperationCode.Callvirt, opJz);
 							ilGenerator.Emit(OperationCode.Ldc_I4_0);
 							ilGenerator.Emit(OperationCode.Ceq);
 							ilGenerator.Emit(OperationCode.Stloc_3);

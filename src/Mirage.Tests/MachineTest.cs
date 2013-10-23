@@ -390,5 +390,69 @@ namespace Mirage
 			m.Output(output);
 			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0xFF, 0xFF });
 		}
+		[Test]
+		public void Should_do_nothing_when_cant_get_argument()
+		{
+			m.LoadData("0x0101");
+			m.DecHiPointer();
+			
+			m.Add();
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x01 });
+
+			m.And();
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x01 });
+
+			m.Or();
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x01 });
+
+			m.Xor();
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x01 });
+
+			m.IncPointers();
+			m.IncHiPointer();
+
+			m.Add();
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x01, 0x00 });
+
+			m.And();
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x01, 0x00 });
+
+			m.Or();
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x01, 0x00 });
+
+			m.Xor();
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x01, 0x00 });
+
+			m.LoadData("0xFF");
+			m.LoadHiPointer();
+			m.DragLoPointer();
+			m.DecHiPointer();
+			m.LoadData("0x01");
+
+			m.Add();
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x01 });
+
+			m.And();
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x01 });
+
+			m.Or();
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x01 });
+
+			m.Xor();
+			m.Output(output);
+			output.GetAndClear.Should().Have.SameSequenceAs(new byte[] { 0x01 });
+
+		}
 	}
 }

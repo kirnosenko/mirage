@@ -91,7 +91,7 @@ namespace Mirage.Cmd
 						machine.Output(output);
 						break;
 					case '{':
-						if (machine.Jmp())
+						if (machine.Jz())
 						{
 							int opened = 1;
 							while (opened > 0)

@@ -104,6 +104,11 @@ namespace Mirage
 		}
 		public void Add()
 		{
+			if (!ArgumentIsExists())
+			{
+				return;
+			}
+
 			byte[] word = GetWord();
 			byte[] argument = GetArgument();
 
@@ -163,6 +168,11 @@ namespace Mirage
 		}
 		public void Logic(Func<byte,byte,byte> func)
 		{
+			if (!ArgumentIsExists())
+			{
+				return;
+			}
+
 			byte[] word = GetWord();
 			byte[] argument = GetArgument();
 
@@ -259,9 +269,13 @@ namespace Mirage
 			}
 		}
 
-		public bool Jmp()
+		public bool Jz()
 		{
 			return ((PointerHi == PointerLo) || WordIsZero());
+		}
+		public bool Jnz()
+		{
+			return !Jz();
 		}
 
 		protected int PointerLo
@@ -322,6 +336,12 @@ namespace Mirage
 			}
 
 			return true;
+		}
+		protected bool ArgumentIsExists()
+		{
+			int argPointerLo = pointerHi - 2*(pointerHi-pointerLo);
+
+			return ((argPointerLo >= 0) && (argPointerLo <= memory.Length));
 		}
 
 		protected void LoadData(byte[] word)
