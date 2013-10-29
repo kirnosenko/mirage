@@ -67,6 +67,42 @@ namespace Mirage.Cmd
 			RunFromFile("../../../../doc/Samples/ROT13.txt");
 			output.GetAndClear.Should().Have.SameSequenceAs(Encoding.UTF8.GetBytes("URYYB jbeyq! 123 [] {}\0"));
 		}
+		[Test]
+		public void Should_run_99bottles_program()
+		{
+			StringBuilder fullSongText = new StringBuilder();
+			int count = 99;
+
+			Func<int,string> countToText = (c) =>
+			{
+				if (count > 9)
+				{
+					return count.ToString();
+				}
+				else if (count > 0)
+				{
+					return "\b" + count.ToString();
+				}
+				else
+				{
+					return "No";
+				}
+			};
+
+			while (count > 0)
+			{
+				fullSongText.AppendLine(countToText(count) + " bottles of beer on the wall,");
+				fullSongText.AppendLine(countToText(count) + " bottles of beer.");
+				fullSongText.AppendLine("Take one down, pass it around,");
+				count--;
+				fullSongText.AppendLine(countToText(count) + " bottles of beer on the wall.");
+				fullSongText.AppendLine();
+			}
+			
+			RunFromFile("../../../../doc/Samples/99 bottles of beer.txt");
+			string outputSongText = Encoding.UTF8.GetString(output.GetAndClear);
+			outputSongText.Should().Be(fullSongText.ToString());
+		}
 		
 		private void RunFromFile(string fileName)
 		{

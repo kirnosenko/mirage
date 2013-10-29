@@ -1,0 +1,23 @@
+﻿(99)%#~
+{
+	#!#
+	( bottles of beer on the wall,)!(0x0A0D)!
+	#!#
+	( bottles of beer.)!(0x0A0D)!
+	(Take one down, pass it around,)!(0x0A0D)!
+	#%-%#(0xFFEF)|~
+	{
+		(0x000A)#+-#
+		(0x10)~+>(0x10)&<_]
+		{
+			#(0x08)#_
+		}
+	}
+	(0x0830)~+>>(0x80)#&#<<_]
+	{
+		#(No)#_
+	}
+	#!#
+	( bottles of beer on the wall.)!(0x0A0D)!!
+	(oN)-~+
+}
