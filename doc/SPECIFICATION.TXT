@@ -1,0 +1,124 @@
+MIRAGE PROGRAMMING LANGUAGE
+===========================
+
+INTRODUCTION
+------------
+Mirage is an esoteric programming language for masochistic aesthetes.
+It combines little brainfuck-like pain and some tricky work with memory.
+
+MEMORY
+------
+There is one large tape of 8-bit memory and two pointers hi pointer (PTH) and lo
+pointer (PTL). Default memory size is 64 Kb. On program load the memory and 
+pointers will be zeroed.
+
+PTH = 0
+v
++---+---+---+---+---+-   -+---+---+---+
+| 0 | 0 | 0 | 0 | 0 | ... | 0 | 0 | 0 |
++---+---+---+---+---+-   -+---+---+---+
+^
+PTL = 0
+
+Pointers determine the size and position of the working word (WRD) and the 
+argument (ARG). ARG is always behind WRD and has the same size.
+
+                PTH = 4
+                v
++---+---+---+---+---+---+-
+|  ARG  |  WRD  | 0 | 0 | ...
++---+---+---+---+---+---+-
+        ^
+        PTL = 2
+
+        PTH = 2
+        v
++---+---+---+---+---+---+-
+| 0 | 0 |  WRD  |  ARG  | ...
++---+---+---+---+---+---+-
+                ^
+                PTL = 4
+
+Also endianness for WRD and ARG depends on order of pointers. It is 
+little-endian when PTH is placed after PTL and big-endian otherwise.
+
+                                                        PTH = 4
+                                                        v
++-------------+-------------+-------------+-------------+-
+| ARG lo byte | ARG hi byte | WRD lo byte | WRD hi byte | ...
++-------------+-------------+-------------+-------------+-
+                            ^
+                            PTL = 2
+
+PTH = 0
+v
++-------------+-------------+-------------+-------------+-
+| WRD hi byte | WRD lo byte | ARG hi byte | ARG lo byte | ...
++-------------+-------------+-------------+-------------+-
+                            ^
+                            PTL = 2
+
+INSTRUCTIONS
+------------
+Syntax  Effect					Description
+>       PTH++                   Increment PTH and PTL (move WRD right).
+        PTL++
+
+<       PTH--                   Decrement PTH and PTL (move WRD left).
+        PTL--
+
+]		PTH++                   Increment PTH.
+
+[		PTH--					Decrement PTH.
+
+#		PTH -= 2*(PTH-PTL)      Reflect PTH off of PTL.
+
+$       PTH = WRD               Load PTH from WRD.
+
+=		PTL = PTH               Set PTL equal to PTH.
+
+%       PTH = PTL               Exchange PTH and PTL.
+        PTL = PTH
+
+_		WRD = 0                 Clear WRD.
+
++       WRD += ARG              Add ARG to WRD.
+
+-       WRD--                   Decrement WRD.
+
+~		WRD = !WRD              Perform a logical NOT on WRD.
+
+&		WRD = WRD & ARG         Perform a logical AND on WRD and ARG.
+
+|		WRD = WRD | ARG         Perform a logical OR on WRD and ARG.
+
+^		WRD = WRD ^ ARG         Perform a logical XOR on WRD and ARG.
+
+*		WRD = 2 * WRD           Perform a left arithmetic shift of WRD by 1.
+
+/		WRD = WRD / 2           Perform a right arithmetic shift of WRD by 1.
+
+(x)     WRD = x                 Load data to WRD. WRD size will be changed to 
+                                fit loaded data size by moving PTH. Supports two
+								data formats: simple string and hex data with 0x
+								prefix.
+								
+?       WRD = input             Receive data from stdin to WRD.
+
+!       output = WDR            Send data from WRD to stdout.
+
+{       JNZ                     Jump past the matching } if WRD is 0 or empty.
+
+}       JMP                     Jump back to the matching {.
+
+Any other symbols are comments.
+Instructions that change pointers will cause pointers check that will set up
+pointers to be inside available memory space.
+Instructions that change or use WRD will do nothing when the size of WRD is 
+zero.
+Instructions that use ARG will do nothing when ARG is placed outside memory 
+space fully or partially.
+
+Input/Output
+------------
+Console input/output uses utf8 encoding.
