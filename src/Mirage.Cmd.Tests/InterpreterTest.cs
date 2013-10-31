@@ -1,4 +1,10 @@
-﻿using System;
+﻿/*
+ * Mirage programming language
+ * 
+ * Copyright (C) 2013  Semyon Kirnosenko
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
