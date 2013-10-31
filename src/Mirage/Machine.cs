@@ -9,9 +9,6 @@ using System.Text;
 
 namespace Mirage
 {
-	/// <summary>
-	/// Machine implemenatation made with simplicity in mind not performance.
-	/// </summary>
 	public class Machine
 	{
 		protected byte[] memory;
@@ -65,23 +62,12 @@ namespace Mirage
 		}
 		public void LoadHiPointer()
 		{
-			if (PointerHi == PointerLo)
-			{
-				pointerHi = 0;
-				return;
-			}
-
-			byte[] word = GetWord();
 			int newHiPointer = 0;
-			
-			int counter = word.Length-1;
-			while (counter >= 0)
-			{
+			WordGet((b) => {
 				newHiPointer = newHiPointer << 8;
-				newHiPointer |= word[counter];
-				counter--;
-			}
-
+				newHiPointer |= b;
+			}, false);
+			
 			PointerHi = newHiPointer;
 		}
 		public void DragLoPointer()
@@ -97,131 +83,42 @@ namespace Mirage
 
 		public void Clear()
 		{
-			byte[] word = GetWord();
-
-			int counter = 0;
-			while (counter < word.Length)
-			{
-				word[counter] = 0;
-				counter++;
-			}
-
-			SetWord(word);
+			WordSet(ClearProcessor, true);
 		}
 		public void Add()
 		{
-			if (!ArgumentIsExists())
-			{
-				return;
-			}
-
-			byte[] word = GetWord();
-			byte[] argument = GetArgument();
-
-			int counter = 0;
-			int carry = 0;
-			while (counter < word.Length)
-			{
-				int sum = word[counter] + argument[counter] + carry;
-				word[counter] = (byte)(sum & 0xFF);
-				carry = sum >> 8;
-				counter++;
-			}
-
-			SetWord(word);
+			WordModify(null, AddProcessor, true, 0);
 		}
 		public void Dec()
 		{
-			byte[] word = GetWord();
-
-			int counter = 0;
-			int carry = 1;
-			while (carry > 0 && counter < word.Length)
-			{
-				int sum = word[counter] - carry;
-				carry = sum < 0 ? 1 : 0;
-				word[counter] = sum < 0 ? (byte)0xFF : (byte)(sum & 0xFF);
-				counter++;
-			}
-
-			SetWord(word);
+			WordModify(DecProcessor, null, true, 1);
 		}
 
 		public void Not()
 		{
-			byte[] word = GetWord();
-
-			int counter = 0;
-			while (counter < word.Length)
-			{
-				word[counter] = (byte)~word[counter];
-				counter++;
-			}
-
-			SetWord(word);
+			WordModify(NotProcessor, null, true, 0);
 		}
 		public void And()
 		{
-			Logic((op1, op2) => (byte)(op1 & op2));
+			WordModify(null, AndProcessor, true, 0);
 		}
 		public void Or()
 		{
-			Logic((op1, op2) => (byte)(op1 | op2));
+			WordModify(null, OrProcessor, true, 0);
 		}
 		public void Xor()
 		{
-			Logic((op1, op2) => (byte)(op1 ^ op2));
+			WordModify(null, XorProcessor, true, 0);
 		}
-		public void Logic(Func<byte,byte,byte> func)
-		{
-			if (!ArgumentIsExists())
-			{
-				return;
-			}
-
-			byte[] word = GetWord();
-			byte[] argument = GetArgument();
-
-			int counter = 0;
-			while (counter < word.Length)
-			{
-				word[counter] = func(word[counter], argument[counter]);
-				counter++;
-			}
-
-			SetWord(word);
-		}
+		
 		public void Sal()
 		{
-			byte[] word = GetWord();
-
-			int counter = 0;
-			byte carry = 0;
-			while (counter < word.Length)
-			{
-				byte b = word[counter];
-				word[counter] = (byte)(((b << 1) & 0xFF) | carry);
-				carry = (b & 0x80) != 0 ? (byte)1 : (byte)0;
-				counter++;
-			}
-
-			SetWord(word);
+			WordModify(SalProcessor, null, true, 0);
 		}
 		public void Sar()
 		{
-			byte[] word = GetWord();
-
-			int counter = word.Length - 1;
-			byte carry = (byte)(word[counter] & 0x80);
-			while (counter >= 0)
-			{
-				byte b = word[counter];
-				word[counter] = (byte)(((b >> 1) & 0xFF) | carry);
-				carry = (b & 0x01) != 0 ? (byte)128 : (byte)0;
-				counter--;
-			}
-
-			SetWord(word);
+			byte hiByte = (byte)(memory[PointerHi < PointerLo ? PointerHi : PointerHi - 1] & 128);
+			WordModify(SarProcessor, null, false, hiByte);
 		}
 
 		public void LoadData(string str)
@@ -263,14 +160,21 @@ namespace Mirage
 			{
 				byte[] word = new byte[Math.Abs(PointerHi - PointerLo)];
 				input(word);
-				SetWord(word);
+				int i = 0;
+				WordSet(() => {
+					return word[i++];
+				}, true);
 			}
 		}
 		public void Output(Action<byte[]> output)
 		{
 			if (output != null)
 			{
-				byte[] word = GetWord();
+				byte[] word = new byte[Math.Abs(PointerHi - PointerLo)];
+				int i = 0;
+				WordGet((b) => {
+					word[i++] = b;
+				}, true);
 				output(word);
 			}
 		}
@@ -322,41 +226,30 @@ namespace Mirage
 				}
 			}
 		}
-		protected int WordSize
-		{
-			get
-			{
-				return Math.Abs(PointerHi - PointerLo);
-			}
-		}
 		protected bool WordIsZero()
 		{
-			byte[] word = GetWord();
+			bool isZero = true;
 
-			foreach (var b in word)
-			{
+			WordGet((b) => {
 				if (b != 0)
 				{
-					return false;
+					isZero = false;
 				}
-			}
-
-			return true;
+			}, true);
+			
+			return isZero;
 		}
-		protected bool ArgumentIsExists()
-		{
-			int argPointerLo = pointerHi - 2*(pointerHi-pointerLo);
-
-			return ((argPointerLo >= 0) && (argPointerLo <= memory.Length));
-		}
-
 		protected void LoadData(byte[] word)
 		{
 			int sizeDelta = word.Length - Math.Abs(PointerHi - PointerLo);
 
 			PointerHi += PointerHi >= PointerLo ? sizeDelta : -sizeDelta;
 
-			SetWord(word);
+			int i = 0;
+			WordSet(() =>
+			{
+				return word[i++];
+			}, true);
 		}
 		protected int HexToInt(char letter)
 		{
@@ -372,90 +265,137 @@ namespace Mirage
 			return 0;
 		}
 
-		protected byte[] GetWord()
+		protected class ByteProcessingData
+		{
+			public byte Byte { get; set; }
+			public byte Flag { get; set; }
+		}
+
+		protected void WordGet(Action<byte> wordGetter, bool direct)
+		{
+			WordProcessing(wordGetter, null, null, null, direct, 0);
+		}
+		protected void WordSet(Func<byte> wordSetter, bool direct)
+		{
+			WordProcessing(null, wordSetter, null, null, direct, 0);
+		}
+		protected void WordModify(
+			Action<byte,byte,ByteProcessingData> wordModifier,
+			Action<byte,byte,byte,ByteProcessingData> wordModifierWithArgument,
+			bool direct,
+			byte initFlag
+		)
+		{
+			WordProcessing(null, null, wordModifier, wordModifierWithArgument, direct, initFlag);
+		}
+		protected void WordProcessing(
+			Action<byte> wordGetter,
+			Func<byte> wordSetter,
+			Action<byte,byte,ByteProcessingData> wordModifier,
+			Action<byte,byte,byte,ByteProcessingData> wordModifierWithArgument,
+			bool direct,
+			byte initFlag
+		)
 		{
 			if (PointerHi == PointerLo)
-			{
-				return new byte[] {};
-			}
-			int pointerDelta = PointerHi > PointerLo ? 1 : -1;
-			int startPointer = PointerLo;
-			int endPoiner = PointerHi;
-			if (pointerDelta < 0)
-			{
-				startPointer -= 1;
-				endPoiner -= 1;
-			}
-
-			byte[] word = new byte[Math.Abs(PointerHi - PointerLo)];
-			int pointer = startPointer;
-			int counter = 0;
-			do
-			{
-				word[counter] = memory[pointer];
-				pointer += pointerDelta;
-				counter++;
-			} while (pointer != endPoiner);
-
-			return word;
-		}
-		protected void SetWord(byte[] word)
-		{
-			if ((PointerHi == PointerLo) || (word.Length == 0))
 			{
 				return;
 			}
-			int pointerDelta = PointerHi > PointerLo ? 1 : -1;
-			int startPointer = PointerLo;
-			int endPoiner = PointerHi;
-			if (pointerDelta < 0)
+			
+			int pointerArgLo = pointerHi - 2 * (pointerHi - pointerLo);
+			if ((wordModifierWithArgument != null) && ((pointerArgLo < 0) || (pointerArgLo > memory.Length)))
 			{
-				startPointer -= 1;
-				endPoiner -= 1;
+				return;
 			}
 
-			int pointer = startPointer;
-			int counter = 0;
-			while ((pointer != endPoiner) && (counter < word.Length))
+			int wordPosition = direct ? pointerLo : pointerHi;
+			int wordFinishPosition = direct ? pointerHi : pointerLo;
+			int argumentPosition = direct ? pointerArgLo : pointerLo;
+			
+			int delta = wordFinishPosition > wordPosition ? 1 : -1;
+			if (delta < 0)
 			{
-				memory[pointer] = word[counter];
-				pointer += pointerDelta;
-				counter++;
-			} 
+				wordPosition--;
+				wordFinishPosition--;
+				argumentPosition--;
+			}
+
+			ByteProcessingData processingData = new ByteProcessingData() { Byte = 0, Flag = initFlag };
+			
+			while (wordPosition != wordFinishPosition)
+			{
+				if (wordSetter == null)
+				{
+					processingData.Byte = memory[wordPosition];
+				}
+
+				if (wordGetter != null)
+				{
+					wordGetter(processingData.Byte);
+				}
+				else if (wordSetter != null)
+				{
+					processingData.Byte = wordSetter();
+				}
+				else if (wordModifier != null)
+				{
+					wordModifier(processingData.Byte, processingData.Flag, processingData);
+				}
+				else
+				{
+					wordModifierWithArgument(processingData.Byte, memory[argumentPosition], processingData.Flag, processingData);
+					argumentPosition += delta;
+				}
+
+				if (wordGetter == null)
+				{
+					memory[wordPosition] = processingData.Byte;
+				}
+				wordPosition += delta;
+			}
 		}
-		protected byte[] GetArgument()
+
+		protected byte ClearProcessor()
 		{
-			if (PointerHi == PointerLo)
-			{
-				return new byte[] {};
-			}
-			int pointerDelta = PointerHi > PointerLo ? 1 : -1;
-			int startPointer = PointerLo;
-			int endPoiner = PointerHi;
-			if (pointerDelta < 0)
-			{
-				startPointer -= 1;
-				endPoiner -= 1;
-				startPointer += Math.Abs(PointerHi - PointerLo);
-				endPoiner += Math.Abs(PointerHi - PointerLo);
-			}
-			else
-			{
-				startPointer -= Math.Abs(PointerHi - PointerLo);
-				endPoiner -= Math.Abs(PointerHi - PointerLo);
-			}
-
-			byte[] argument = new byte[Math.Abs(PointerHi - PointerLo)];
-			int pointer = startPointer;
-			int counter = 0;
-			do
-			{
-				argument[counter] = memory[pointer];
-				pointer += pointerDelta;
-				counter++;
-			} while (pointer != endPoiner);
-
-			return argument;
+			return 0;
+		}
+		protected void AddProcessor(byte wordByte, byte argumentByte, byte flag, ByteProcessingData result)
+		{
+			int sum = wordByte + argumentByte + flag;
+			result.Byte = (byte)(sum & 0xFF);
+			result.Flag = (byte)(sum >> 8);
+		}
+		protected void DecProcessor(byte wordByte, byte flag, ByteProcessingData result)
+		{
+			int sum = wordByte - flag;
+			result.Byte = (byte)(sum < 0 ? 0xFF : sum);
+			result.Flag = (byte)(sum < 0 ? 1 : 0);
+		}
+		protected void NotProcessor(byte wordByte, byte flag, ByteProcessingData result)
+		{
+			result.Byte = (byte)(~wordByte);
+		}
+		protected void AndProcessor(byte wordByte, byte argumentByte, byte flag, ByteProcessingData result)
+		{
+			result.Byte = (byte)(wordByte & argumentByte);
+		}
+		protected void OrProcessor(byte wordByte, byte argumentByte, byte flag, ByteProcessingData result)
+		{
+			result.Byte = (byte)(wordByte | argumentByte);
+		}
+		protected void XorProcessor(byte wordByte, byte argumentByte, byte flag, ByteProcessingData result)
+		{
+			result.Byte = (byte)(wordByte ^ argumentByte);
+		}
+		protected void SalProcessor(byte wordByte, byte flag, ByteProcessingData result)
+		{
+			result.Byte = (byte)(((wordByte << 1) & 0xFF) | flag);
+			result.Flag = (byte)((wordByte & 0x80) >> 7);
+		}
+		protected void SarProcessor(byte wordByte, byte flag, ByteProcessingData result)
+		{
+			result.Byte = (byte)(((wordByte >> 1) & 0xFF) | flag);
+			result.Flag = (byte)((wordByte & 0x01) << 7);
 		}
 	}
 }

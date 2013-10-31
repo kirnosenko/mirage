@@ -88,6 +88,10 @@ namespace Mirage.Compiler
 				// Add types to the assembly
 
 				assembly.AllTypes.Add(machineType);
+				foreach (var t in machineType.NestedTypes)
+				{
+					assembly.AllTypes.Add(t);
+				}
 				assembly.AllTypes.Add(inputType);
 				assembly.AllTypes.Add(outputType);
 				assembly.AllTypes.Add(programClass);
