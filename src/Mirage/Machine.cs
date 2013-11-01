@@ -87,38 +87,38 @@ namespace Mirage
 		}
 		public void Add()
 		{
-			WordModify(null, AddProcessor, true, 0);
+			WordModifyWithArgument(AddProcessor, true, 0);
 		}
 		public void Dec()
 		{
-			WordModify(DecProcessor, null, true, 1);
+			WordModify(DecProcessor, true, 1);
 		}
 
 		public void Not()
 		{
-			WordModify(NotProcessor, null, true, 0);
+			WordModify(NotProcessor, true, 0);
 		}
 		public void And()
 		{
-			WordModify(null, AndProcessor, true, 0);
+			WordModifyWithArgument(AndProcessor, true, 0);
 		}
 		public void Or()
 		{
-			WordModify(null, OrProcessor, true, 0);
+			WordModifyWithArgument(OrProcessor, true, 0);
 		}
 		public void Xor()
 		{
-			WordModify(null, XorProcessor, true, 0);
+			WordModifyWithArgument(XorProcessor, true, 0);
 		}
 		
 		public void Sal()
 		{
-			WordModify(SalProcessor, null, true, 0);
+			WordModify(SalProcessor, true, 0);
 		}
 		public void Sar()
 		{
 			byte hiByte = (byte)(memory[PointerHi < PointerLo ? PointerHi : PointerHi - 1] & 128);
-			WordModify(SarProcessor, null, false, hiByte);
+			WordModify(SarProcessor, false, hiByte);
 		}
 
 		public void LoadData(string str)
@@ -265,12 +265,6 @@ namespace Mirage
 			return 0;
 		}
 
-		protected class ByteProcessingData
-		{
-			public byte Byte { get; set; }
-			public byte Flag { get; set; }
-		}
-
 		protected void WordGet(Action<byte> wordGetter, bool direct)
 		{
 			WordProcessing(wordGetter, null, null, null, direct, 0);
@@ -279,20 +273,21 @@ namespace Mirage
 		{
 			WordProcessing(null, wordSetter, null, null, direct, 0);
 		}
-		protected void WordModify(
-			Action<byte,byte,ByteProcessingData> wordModifier,
-			Action<byte,byte,byte,ByteProcessingData> wordModifierWithArgument,
-			bool direct,
-			byte initFlag
-		)
+		protected void WordModify(Action<byte,byte> wordModifier, bool direct, byte initFlag)
 		{
-			WordProcessing(null, null, wordModifier, wordModifierWithArgument, direct, initFlag);
+			WordProcessing(null, null, wordModifier, null, direct, initFlag);
 		}
+		protected void WordModifyWithArgument(Action<byte,byte,byte> wordModifierWithArgument, bool direct, byte initFlag)
+		{
+			WordProcessing(null, null, null, wordModifierWithArgument, direct, initFlag);
+		}
+		protected byte processingResultByte;
+		protected byte processingResultFlag;
 		protected void WordProcessing(
 			Action<byte> wordGetter,
 			Func<byte> wordSetter,
-			Action<byte,byte,ByteProcessingData> wordModifier,
-			Action<byte,byte,byte,ByteProcessingData> wordModifierWithArgument,
+			Action<byte,byte> wordModifier,
+			Action<byte,byte,byte> wordModifierWithArgument,
 			bool direct,
 			byte initFlag
 		)
@@ -320,36 +315,37 @@ namespace Mirage
 				argumentPosition--;
 			}
 
-			ByteProcessingData processingData = new ByteProcessingData() { Byte = 0, Flag = initFlag };
+			processingResultByte = 0;
+			processingResultFlag = initFlag;
 			
 			while (wordPosition != wordFinishPosition)
 			{
 				if (wordSetter == null)
 				{
-					processingData.Byte = memory[wordPosition];
+					processingResultByte = memory[wordPosition];
 				}
 
 				if (wordGetter != null)
 				{
-					wordGetter(processingData.Byte);
+					wordGetter(processingResultByte);
 				}
 				else if (wordSetter != null)
 				{
-					processingData.Byte = wordSetter();
+					processingResultByte = wordSetter();
 				}
 				else if (wordModifier != null)
 				{
-					wordModifier(processingData.Byte, processingData.Flag, processingData);
+					wordModifier(processingResultByte, processingResultFlag);
 				}
 				else
 				{
-					wordModifierWithArgument(processingData.Byte, memory[argumentPosition], processingData.Flag, processingData);
+					wordModifierWithArgument(processingResultByte, memory[argumentPosition], processingResultFlag);
 					argumentPosition += delta;
 				}
 
 				if (wordGetter == null)
 				{
-					memory[wordPosition] = processingData.Byte;
+					memory[wordPosition] = processingResultByte;
 				}
 				wordPosition += delta;
 			}
@@ -359,43 +355,43 @@ namespace Mirage
 		{
 			return 0;
 		}
-		protected void AddProcessor(byte wordByte, byte argumentByte, byte flag, ByteProcessingData result)
+		protected void AddProcessor(byte wordByte, byte argumentByte, byte flag)
 		{
 			int sum = wordByte + argumentByte + flag;
-			result.Byte = (byte)(sum & 0xFF);
-			result.Flag = (byte)(sum >> 8);
+			processingResultByte = (byte)(sum & 0xFF);
+			processingResultFlag = (byte)(sum >> 8);
 		}
-		protected void DecProcessor(byte wordByte, byte flag, ByteProcessingData result)
+		protected void DecProcessor(byte wordByte, byte flag)
 		{
 			int sum = wordByte - flag;
-			result.Byte = (byte)(sum < 0 ? 0xFF : sum);
-			result.Flag = (byte)(sum < 0 ? 1 : 0);
+			processingResultByte = (byte)(sum < 0 ? 0xFF : sum);
+			processingResultFlag = (byte)(sum < 0 ? 1 : 0);
 		}
-		protected void NotProcessor(byte wordByte, byte flag, ByteProcessingData result)
+		protected void NotProcessor(byte wordByte, byte flag)
 		{
-			result.Byte = (byte)(~wordByte);
+			processingResultByte = (byte)(~wordByte);
 		}
-		protected void AndProcessor(byte wordByte, byte argumentByte, byte flag, ByteProcessingData result)
+		protected void AndProcessor(byte wordByte, byte argumentByte, byte flag)
 		{
-			result.Byte = (byte)(wordByte & argumentByte);
+			processingResultByte = (byte)(wordByte & argumentByte);
 		}
-		protected void OrProcessor(byte wordByte, byte argumentByte, byte flag, ByteProcessingData result)
+		protected void OrProcessor(byte wordByte, byte argumentByte, byte flag)
 		{
-			result.Byte = (byte)(wordByte | argumentByte);
+			processingResultByte = (byte)(wordByte | argumentByte);
 		}
-		protected void XorProcessor(byte wordByte, byte argumentByte, byte flag, ByteProcessingData result)
+		protected void XorProcessor(byte wordByte, byte argumentByte, byte flag)
 		{
-			result.Byte = (byte)(wordByte ^ argumentByte);
+			processingResultByte = (byte)(wordByte ^ argumentByte);
 		}
-		protected void SalProcessor(byte wordByte, byte flag, ByteProcessingData result)
+		protected void SalProcessor(byte wordByte, byte flag)
 		{
-			result.Byte = (byte)(((wordByte << 1) & 0xFF) | flag);
-			result.Flag = (byte)((wordByte & 0x80) >> 7);
+			processingResultByte = (byte)(((wordByte << 1) & 0xFF) | flag);
+			processingResultFlag = (byte)((wordByte & 0x80) >> 7);
 		}
-		protected void SarProcessor(byte wordByte, byte flag, ByteProcessingData result)
+		protected void SarProcessor(byte wordByte, byte flag)
 		{
-			result.Byte = (byte)(((wordByte >> 1) & 0xFF) | flag);
-			result.Flag = (byte)((wordByte & 0x01) << 7);
+			processingResultByte = (byte)(((wordByte >> 1) & 0xFF) | flag);
+			processingResultFlag = (byte)((wordByte & 0x01) << 7);
 		}
 	}
 }
